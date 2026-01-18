@@ -19,6 +19,629 @@ interface SectionProps {
 // 近似计算章节
 // ============================================
 
+// ============================================
+// 分析函数进阶章节
+// ============================================
+
+export function AdvancedAnalyticsSection({ sectionId, addNote, updateNote, deleteNote, getNotesForBlock }: SectionProps) {
+  const noteProps = (blockId: string) => ({
+    sectionId,
+    blockId,
+    notes: getNotesForBlock(sectionId, blockId),
+    onAddNote: (content: string) => addNote(sectionId, blockId, content),
+    onUpdateNote: updateNote,
+    onDeleteNote: deleteNote,
+  });
+
+  return (
+    <div>
+      <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">分析函数进阶</h2>
+      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"统计学在 SQL 中的应用"</p>
+
+      <Paragraph {...noteProps('p1')}>
+        分析函数（Analytical Functions）是 SQL 中的高级统计工具，提供了丰富的统计计算功能。从简单的描述性统计到复杂的概率分布计算，都能在 SQL 中完成。
+      </Paragraph>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">描述性统计</h3>
+
+      <CodeBlock
+        title="基本统计量"
+        code={`-- 计算数值列的统计信息
+SELECT
+    COUNT(*) AS total_count,
+    COUNT(DISTINCT column_name) AS unique_count,
+    AVG(column_name) AS mean_value,
+    MEDIAN(column_name) AS median_value,
+    MODE(column_name) AS mode_value,
+    STDDEV(column_name) AS standard_deviation,
+    VARIANCE(column_name) AS variance_value,
+    MIN(column_name) AS min_value,
+    MAX(column_name) AS max_value,
+    QUANTILE(column_name, 0.25) AS q1,
+    QUANTILE(column_name, 0.75) AS q3
+FROM your_table;
+
+-- 分组统计
+SELECT
+    category,
+    COUNT(*) AS count_in_group,
+    AVG(value) AS avg_in_group,
+    STDDEV(value) AS std_in_group
+FROM your_table
+GROUP BY category;`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">相关性和协方差</h3>
+
+      <CodeBlock
+        title="相关系数计算"
+        code={`-- Pearson 相关系数
+SELECT CORR(x, y) AS pearson_correlation
+FROM your_table;
+
+-- Spearman 秩相关系数
+SELECT CORR(x, y, 'spearman') AS spearman_correlation
+FROM your_table;
+
+-- Kendall tau 相关系数
+SELECT CORR(x, y, 'kendall') AS kendall_correlation
+FROM your_table;
+
+-- 计算协方差
+SELECT COVAR_POP(x, y) AS population_covariance,
+       COVAR_SAMP(x, y) AS sample_covariance
+FROM your_table;`}
+        {...noteProps('code2')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">分布分析</h3>
+
+      <CodeBlock
+        title="正态分布检验"
+        code={`-- Shapiro-Wilk 正态性检验
+SELECT shapiro_wilk_test(column_name) AS normality_test
+FROM your_table;
+
+-- Kolmogorov-Smirnov 检验
+SELECT ks_test(column_name, 'normal') AS ks_test_result
+FROM your_table;
+
+-- 计算偏度和峰度
+SELECT
+    SKEWNESS(column_name) AS skewness,
+    KURTOSIS(column_name) AS kurtosis
+FROM your_table;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">假设检验</h3>
+
+      <CodeBlock
+        title="t检验和F检验"
+        code={`-- 单样本 t 检验
+SELECT t_test(column_name, hypothesized_mean) AS t_test_result
+FROM your_table;
+
+-- 两样本 t 检验
+SELECT t_test(sample1, sample2) AS two_sample_t_test
+FROM (
+    SELECT column_name AS sample1 FROM table1
+    UNION ALL
+    SELECT column_name AS sample2 FROM table2
+);
+
+-- F 检验（方差齐性检验）
+SELECT f_test(group1_values, group2_values) AS f_test_result
+FROM your_grouped_data;`}
+        {...noteProps('code4')}
+      />
+
+      <InfoBox type="experiment" title="实践建议" {...noteProps('box1')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li>先用描述性统计了解数据分布</li>
+          <li>使用相关分析发现变量关系</li>
+          <li>进行正态性检验选择合适的统计方法</li>
+          <li>根据数据特点选择合适的假设检验</li>
+        </ul>
+      </InfoBox>
+    </div>
+  );
+}
+
+// ============================================
+// LATERAL JOIN 章节
+// ============================================
+
+export function LateralJoinSection({ sectionId, addNote, updateNote, deleteNote, getNotesForBlock }: SectionProps) {
+  const noteProps = (blockId: string) => ({
+    sectionId,
+    blockId,
+    notes: getNotesForBlock(sectionId, blockId),
+    onAddNote: (content: string) => addNote(sectionId, blockId, content),
+    onUpdateNote: updateNote,
+    onDeleteNote: deleteNote,
+  });
+
+  return (
+    <div>
+      <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">LATERAL JOIN</h2>
+      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"关联查询的进阶技巧"</p>
+
+      <Paragraph {...noteProps('p1')}>
+        LATERAL JOIN 是一种特殊的 JOIN，它允许在 ON 或 USING 子句中引用左侧表的列。这使得可以进行一些复杂的关联查询，特别是当右侧的子查询需要依赖左侧的数据时。
+      </Paragraph>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">基本概念</h3>
+
+      <CodeBlock
+        title="LATERAL JOIN 语法"
+        code={`-- LATERAL JOIN 基本语法
+SELECT t1.column1, t2.column2
+FROM table1 t1
+LATERAL (
+    SELECT column2
+    FROM table2 t2
+    WHERE t2.foreign_key = t1.primary_key
+    LIMIT 1  -- 可以限制结果数量
+) t2 ON TRUE;  -- ON TRUE 因为条件已在子查询中
+
+-- 也可以写成 LEFT LATERAL
+SELECT t1.column1, sub.result
+FROM table1 t1
+LEFT LATERAL (
+    SELECT some_function(t1.column1) AS result
+) sub ON TRUE;`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">实际应用场景</h3>
+
+      <CodeBlock
+        title="查找每个用户最新的订单"
+        code={`-- 为每个用户找到最近的订单
+SELECT u.user_id, u.name, latest_order.order_date, latest_order.amount
+FROM users u
+LATERAL (
+    SELECT order_date, amount
+    FROM orders o
+    WHERE o.user_id = u.user_id
+    ORDER BY order_date DESC
+    LIMIT 1
+) latest_order ON TRUE;
+
+-- 传统方式（效率较低）
+SELECT u.user_id, u.name, o.order_date, o.amount
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.user_id
+WHERE o.order_date = (
+    SELECT MAX(order_date)
+    FROM orders
+    WHERE user_id = u.user_id
+);`}
+        {...noteProps('code2')}
+      />
+
+      <CodeBlock
+        title="计算移动平均"
+        code={`-- 计算每个产品最近7天的平均销量
+SELECT p.product_id, p.name, stats.avg_sales, stats.total_sales
+FROM products p
+LATERAL (
+    SELECT
+        AVG(s.sales_amount) AS avg_sales,
+        SUM(s.sales_amount) AS total_sales
+    FROM sales s
+    WHERE s.product_id = p.product_id
+    AND s.sale_date >= CURRENT_DATE - INTERVAL '7 days'
+) stats ON TRUE;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">性能考虑</h3>
+
+      <InfoBox type="warning" title="性能提示" {...noteProps('box1')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li>LATERAL JOIN 可能导致嵌套循环，注意查询效率</li>
+          <li>对于大数据集，考虑使用窗口函数或 CTE 优化</li>
+          <li>确保子查询中的条件能够有效过滤数据</li>
+        </ul>
+      </InfoBox>
+
+      <CodeBlock
+        title="优化示例"
+        code={`-- 使用 LATERAL 但添加适当的索引
+CREATE INDEX idx_orders_user_date ON orders(user_id, order_date DESC);
+
+-- 或者改用窗口函数
+SELECT DISTINCT u.user_id, u.name,
+       FIRST_VALUE(o.order_date) OVER w AS latest_date,
+       FIRST_VALUE(o.amount) OVER w AS latest_amount
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.user_id
+WINDOW w AS (PARTITION BY u.user_id ORDER BY o.order_date DESC);`}
+        {...noteProps('code4')}
+      />
+    </div>
+  );
+}
+
+// ============================================
+// QUALIFY 子句章节
+// ============================================
+
+export function QualifySection({ sectionId, addNote, updateNote, deleteNote, getNotesForBlock }: SectionProps) {
+  const noteProps = (blockId: string) => ({
+    sectionId,
+    blockId,
+    notes: getNotesForBlock(sectionId, blockId),
+    onAddNote: (content: string) => addNote(sectionId, blockId, content),
+    onUpdateNote: updateNote,
+    onDeleteNote: deleteNote,
+  });
+
+  return (
+    <div>
+      <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">QUALIFY 子句</h2>
+      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"优雅地过滤窗口函数结果"</p>
+
+      <Paragraph {...noteProps('p1')}>
+        QUALIFY 子句是窗口函数的过滤器，它允许在应用窗口函数后根据计算结果进行过滤。与 HAVING 子句类似，但专门用于窗口函数。
+      </Paragraph>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">基本语法</h3>
+
+      <CodeBlock
+        title="QUALIFY 语法结构"
+        code={`SELECT column1, column2, window_function() OVER (...) AS wf_result
+FROM table_name
+WHERE condition1  -- 先过滤原始行
+GROUP BY column3  -- 可选的分组
+HAVING condition2 -- 可选的分组过滤
+WINDOW window_definition  -- 可选的窗口定义
+QUALIFY condition3  -- 对窗口函数结果进行过滤
+ORDER BY column4;`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">实际应用</h3>
+
+      <CodeBlock
+        title="查找每个部门薪资最高的员工"
+        code={`-- 使用 QUALIFY 查找每个部门薪资最高的员工
+SELECT department, employee_name, salary
+FROM employees
+QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY department
+    ORDER BY salary DESC
+) = 1;
+
+-- 等价的传统写法（更复杂）
+SELECT department, employee_name, salary
+FROM (
+    SELECT department, employee_name, salary,
+           ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+    FROM employees
+) ranked
+WHERE rn = 1;`}
+        {...noteProps('code2')}
+      />
+
+      <CodeBlock
+        title="查找销售额连续增长的产品"
+        code={`-- 查找销售额连续3个月增长的产品
+SELECT product_id, month, sales
+FROM monthly_sales
+QUALIFY sales > LAG(sales) OVER (
+    PARTITION BY product_id
+    ORDER BY month
+)
+AND LAG(sales) > LAG(sales, 2) OVER (
+    PARTITION BY product_id
+    ORDER BY month
+);`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">与 HAVING 的区别</h3>
+
+      <div className="overflow-x-auto my-6">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-slate-100 dark:bg-slate-700">
+              <th className="border border-slate-200 dark:border-slate-600 px-4 py-2 text-left text-slate-800 dark:text-slate-200">特性</th>
+              <th className="border border-slate-200 dark:border-slate-600 px-4 py-2 text-left text-slate-800 dark:text-slate-200">HAVING</th>
+              <th className="border border-slate-200 dark:border-slate-600 px-4 py-2 text-left text-slate-800 dark:text-slate-200">QUALIFY</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-600 dark:text-slate-300">
+            <tr><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">作用对象</td><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">GROUP BY 后的分组</td><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">窗口函数结果</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">执行顺序</td><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">GROUP BY 后</td><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">窗口函数后</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">可用聚合函数</td><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">✅</td><td className="border border-slate-200 dark:border-slate-600 px-4 py-2">❌（用窗口函数）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <InfoBox type="experiment" title="实践练习" {...noteProps('box1')}>
+        查找每个季度销售额排名前3的产品，但只显示销售额超过10000的记录。
+        <details className="mt-2">
+          <summary className="cursor-pointer text-purple-600 dark:text-purple-400">查看答案</summary>
+          <code className="block mt-2 bg-purple-100 dark:bg-purple-900 p-2 rounded text-sm">
+            SELECT product_id, quarter, sales<br/>
+            FROM quarterly_sales<br/>
+            QUALIFY RANK() OVER (PARTITION BY quarter ORDER BY sales DESC) &lt;= 3<br/>
+            AND sales &gt; 10000;
+          </code>
+        </details>
+      </InfoBox>
+    </div>
+  );
+}
+
+// ============================================
+// SAMPLE 采样章节
+// ============================================
+
+export function SamplingSection({ sectionId, addNote, updateNote, deleteNote, getNotesForBlock }: SectionProps) {
+  const noteProps = (blockId: string) => ({
+    sectionId,
+    blockId,
+    notes: getNotesForBlock(sectionId, blockId),
+    onAddNote: (content: string) => addNote(sectionId, blockId, content),
+    onUpdateNote: updateNote,
+    onDeleteNote: deleteNote,
+  });
+
+  return (
+    <div>
+      <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">SAMPLE 采样</h2>
+      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"大数据集的快速预览"</p>
+
+      <Paragraph {...noteProps('p1')}>
+        SAMPLE 子句允许从大数据集中快速获取代表性样本，用于数据探索、快速分析和原型开发，而不必处理整个数据集。
+      </Paragraph>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">采样方法</h3>
+
+      <CodeBlock
+        title="SAMPLE 子句语法"
+        code={`-- 基本语法
+SELECT * FROM table_name
+SAMPLE sample_size;
+
+-- 支持多种采样方式
+SELECT * FROM table_name
+SAMPLE number ROWS;           -- 采样指定行数
+
+SELECT * FROM table_name
+SAMPLE percentage PERCENT;    -- 采样百分比
+
+SELECT * FROM table_name
+SAMPLE number PERCENT;        -- 按百分比采样
+
+-- 分层采样（按列分组采样）
+SELECT * FROM table_name
+SAMPLE number ROWS BY column_name;`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">实际应用</h3>
+
+      <CodeBlock
+        title="数据探索采样"
+        code={`-- 从大数据集采样1000行进行快速分析
+SELECT * FROM large_dataset
+SAMPLE 1000 ROWS;
+
+-- 采样10%的数据进行统计分析
+SELECT
+    AVG(salary) AS avg_salary,
+    STDDEV(salary) AS salary_std,
+    COUNT(*) AS sample_size
+FROM employees
+SAMPLE 10 PERCENT;
+
+-- 按部门分层采样
+SELECT department, AVG(salary), COUNT(*)
+FROM employees
+SAMPLE 100 ROWS BY department
+GROUP BY department;`}
+        {...noteProps('code2')}
+      />
+
+      <CodeBlock
+        title="开发和测试场景"
+        code={`-- 在开发阶段使用小样本测试查询
+SELECT * FROM user_events
+SAMPLE 1000 ROWS
+WHERE event_date >= '2024-01-01';
+
+-- 快速验证数据质量
+SELECT
+    COUNT(*) AS total_rows,
+    COUNT(CASE WHEN column_name IS NULL THEN 1 END) AS null_count,
+    AVG(LENGTH(column_name)) AS avg_length
+FROM large_table
+SAMPLE 10000 ROWS;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">采样算法</h3>
+
+      <InfoBox type="tip" title="采样算法说明" {...noteProps('box1')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li><strong>系统采样</strong>：按固定间隔选择行，保持数据分布</li>
+          <li><strong>随机采样</strong>：完全随机选择，保证无偏但可能丢失分布特征</li>
+          <li><strong>分层采样</strong>：在每个分组内分别采样，保持分组比例</li>
+        </ul>
+      </InfoBox>
+
+      <CodeBlock
+        title="性能对比"
+        code={`-- 大数据集：直接查询 vs 采样查询
+-- 原始查询（可能需要几分钟）
+SELECT AVG(sales_amount) FROM sales_2024;
+
+-- 采样查询（几秒钟完成）
+SELECT AVG(sales_amount) * 100 AS estimated_avg
+FROM sales_2024
+SAMPLE 1 PERCENT;`}
+        {...noteProps('code4')}
+      />
+
+      <InfoBox type="warning" title="使用注意事项" {...noteProps('box2')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li>采样结果是近似值，不是精确值</li>
+          <li>对于需要精确结果的查询，不要使用采样</li>
+          <li>采样不保证返回结果的排序</li>
+          <li>LIMIT 子句在 SAMPLE 之后应用</li>
+        </ul>
+      </InfoBox>
+    </div>
+  );
+}
+
+// ============================================
+// 全文搜索章节
+// ============================================
+
+export function FulltextSearchSection({ sectionId, addNote, updateNote, deleteNote, getNotesForBlock }: SectionProps) {
+  const noteProps = (blockId: string) => ({
+    sectionId,
+    blockId,
+    notes: getNotesForBlock(sectionId, blockId),
+    onAddNote: (content: string) => addNote(sectionId, blockId, content),
+    onUpdateNote: updateNote,
+    onDeleteNote: deleteNote,
+  });
+
+  return (
+    <div>
+      <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">全文搜索</h2>
+      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"在文本中寻找针尖"</p>
+
+      <Paragraph {...noteProps('p1')}>
+        全文搜索（Full-Text Search）允许在大量文本数据中进行高效的关键词搜索，支持模糊匹配、相关性排序和复杂查询。
+      </Paragraph>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">基本用法</h3>
+
+      <CodeBlock
+        title="全文搜索语法"
+        code={`-- 基本全文搜索
+SELECT * FROM articles
+WHERE title MATCH 'machine learning';
+
+-- 使用 CONTAINS 函数
+SELECT * FROM documents
+WHERE CONTAINS(content, 'database');
+
+-- 多个关键词搜索
+SELECT * FROM posts
+WHERE title MATCH 'SQL OR database OR query';
+
+-- 短语搜索
+SELECT * FROM books
+WHERE description MATCH '"machine learning"';`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">高级搜索特性</h3>
+
+      <CodeBlock
+        title="搜索操作符"
+        code={`-- AND 操作（默认）
+SELECT * FROM articles WHERE content MATCH 'SQL database';
+
+-- OR 操作
+SELECT * FROM articles WHERE content MATCH 'SQL OR database';
+
+-- NOT 操作
+SELECT * FROM articles WHERE content MATCH 'SQL -tutorial';
+
+-- 短语搜索（连续的词）
+SELECT * FROM articles WHERE content MATCH '"machine learning"';
+
+-- 通配符搜索
+SELECT * FROM articles WHERE content MATCH 'databas*';
+
+-- 邻近搜索（词语相邻）
+SELECT * FROM articles WHERE content MATCH '"SQL database"~5';`}
+        {...noteProps('code2')}
+      />
+
+      <CodeBlock
+        title="相关性排序"
+        code={`-- 按相关性排序
+SELECT title, content,
+       MATCH_RELEVANCE(content, 'SQL database') AS relevance_score
+FROM articles
+WHERE content MATCH 'SQL database'
+ORDER BY relevance_score DESC;
+
+-- 带权重的搜索
+SELECT title,
+       (MATCH_RELEVANCE(title, 'SQL') * 2 +
+        MATCH_RELEVANCE(content, 'SQL')) / 3 AS weighted_score
+FROM articles
+WHERE title MATCH 'SQL' OR content MATCH 'SQL'
+ORDER BY weighted_score DESC;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">索引优化</h3>
+
+      <CodeBlock
+        title="创建全文索引"
+        code={`-- 创建全文索引
+CREATE INDEX idx_articles_content ON articles
+USING FTS(content);
+
+-- 为多个列创建联合全文索引
+CREATE INDEX idx_articles_fulltext ON articles
+USING FTS(title, content, tags);
+
+-- 查看索引使用情况
+EXPLAIN QUERY PLAN
+SELECT * FROM articles
+WHERE content MATCH 'database';`}
+        {...noteProps('code4')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">分词和词干提取</h3>
+
+      <CodeBlock
+        title="文本处理函数"
+        code={`-- 基本分词
+SELECT UNNEST(STRING_SPLIT(content, ' ')) AS words
+FROM articles
+WHERE id = 1;
+
+-- 词干提取（stemming）
+SELECT word, STEM(word) AS stem
+FROM (SELECT UNNEST(STRING_SPLIT(content, ' ')) AS word
+      FROM articles WHERE id = 1);
+
+-- 停用词过滤
+SELECT word
+FROM (SELECT UNNEST(STRING_SPLIT(content, ' ')) AS word
+      FROM articles WHERE id = 1)
+WHERE word NOT IN ('the', 'a', 'an', 'and', 'or', 'but', 'is', 'are');`}
+        {...noteProps('code5')}
+      />
+
+      <InfoBox type="experiment" title="性能优化建议" {...noteProps('box1')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li>为经常搜索的列创建 FTS 索引</li>
+          <li>使用相关性评分进行结果排序</li>
+          <li>考虑分词和词干提取提高搜索质量</li>
+          <li>定期重建索引以保持搜索性能</li>
+        </ul>
+      </InfoBox>
+    </div>
+  );
+}
+
 export function ApproximateComputingSection({ sectionId, addNote, updateNote, deleteNote, getNotesForBlock }: SectionProps) {
   const noteProps = (blockId: string) => ({
     sectionId,
