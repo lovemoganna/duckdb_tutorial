@@ -2334,7 +2334,7 @@ SELECT * FROM concept_paths ORDER BY full_path;`}
           />
         );
 
-      case 'parallel':
+      case 'parallel-processing':
         return (
           <ParallelProcessingSection
             sectionId={sectionId}
@@ -2345,7 +2345,7 @@ SELECT * FROM concept_paths ORDER BY full_path;`}
           />
         );
 
-      case 'statistics':
+      case 'statistics-info':
         return (
           <StatisticsInfoSection
             sectionId={sectionId}
