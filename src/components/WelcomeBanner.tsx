@@ -42,8 +42,8 @@ export function WelcomeBanner({ completedCount, totalSections, onDismiss }: Welc
       {/* 背景动画 */}
       <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 dark:from-amber-600 dark:via-orange-600 dark:to-rose-600" />
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-1/2 -left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-1/2 -right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+        <div className="absolute -top-1/2 -left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-1/2 -right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative p-6 md:p-8">
@@ -60,7 +60,7 @@ export function WelcomeBanner({ completedCount, totalSections, onDismiss }: Welc
         <div className="flex flex-col md:flex-row items-center gap-6">
           {/* 左侧图标和文案 */}
           <div className="flex-shrink-0 text-center md:text-left">
-            <div className="text-6xl mb-3 animate-bounce-soft">🦆</div>
+            <div className="text-6xl mb-3">🦆</div>
           </div>
 
           <div className="flex-1 text-center md:text-left">

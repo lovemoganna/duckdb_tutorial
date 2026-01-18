@@ -5,12 +5,12 @@ import type { Note } from '../types';
 interface CodeBlockProps {
   code: string;
   title?: string;
-  sectionId: string;
-  blockId: string;
-  notes: Note[];
-  onAddNote: (content: string) => void;
-  onUpdateNote: (id: string, content: string) => void;
-  onDeleteNote: (id: string) => void;
+  sectionId?: string;
+  blockId?: string;
+  notes?: Note[];
+  onAddNote?: (content: string) => void;
+  onUpdateNote?: (id: string, content: string) => void;
+  onDeleteNote?: (id: string) => void;
   showLineNumbers?: boolean;
   highlightLines?: number[];
   language?: 'sql' | 'text' | 'json';
@@ -264,14 +264,16 @@ export function CodeBlock({
           <span className="text-xs text-slate-400">
             {lineCount} 行
           </span>
-          <NoteButton
-            sectionId={sectionId}
-            blockId={blockId}
-            notes={notes}
-            onAdd={onAddNote}
-            onUpdate={onUpdateNote}
-            onDelete={onDeleteNote}
-          />
+          {notes !== undefined && onAddNote && onUpdateNote && onDeleteNote && sectionId && blockId && (
+            <NoteButton
+              sectionId={sectionId}
+              blockId={blockId}
+              notes={notes}
+              onAdd={onAddNote}
+              onUpdate={onUpdateNote}
+              onDelete={onDeleteNote}
+            />
+          )}
           <button
             onClick={copyToClipboard}
             className={`px-3 py-1.5 text-xs rounded-lg transition-all flex items-center gap-1.5 border ${

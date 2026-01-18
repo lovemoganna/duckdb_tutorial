@@ -518,125 +518,452 @@ export function FulltextSearchSection({ sectionId, addNote, updateNote, deleteNo
   return (
     <div>
       <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">全文搜索</h2>
-      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"在文本中寻找针尖"</p>
+      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"在文本中寻找针尖，高效检索海量内容"</p>
 
       <Paragraph {...noteProps('p1')}>
-        全文搜索（Full-Text Search）允许在大量文本数据中进行高效的关键词搜索，支持模糊匹配、相关性排序和复杂查询。
+        全文搜索（Full-Text Search）是现代数据库的核心功能之一，它允许在大量非结构化文本数据中进行高效的关键词搜索。与传统的 LIKE 模糊匹配不同，全文搜索支持自然语言查询、相关性排序、模糊匹配和复杂布尔逻辑。
       </Paragraph>
 
-      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">基本用法</h3>
+      <InfoBox type="fastai" title="全文搜索 vs 传统搜索" {...noteProps('box2')}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">❌ 传统 LIKE 搜索</h4>
+            <ul className="text-sm space-y-1">
+              <li>• 只能前缀匹配 %keyword%</li>
+              <li>• 无法处理词干变化</li>
+              <li>• 不支持相关性排序</li>
+              <li>• 性能差，索引无效</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">✅ 全文搜索</h4>
+            <ul className="text-sm space-y-1">
+              <li>• 自然语言查询支持</li>
+              <li>• 词干提取和同义词</li>
+              <li>• 相关性评分排序</li>
+              <li>• 专用索引，性能卓越</li>
+            </ul>
+          </div>
+        </div>
+      </InfoBox>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">基础语法</h3>
+
+      <SQLExplainer
+        sql={`-- 基本全文搜索语法
+SELECT title, content, author
+FROM articles
+WHERE content MATCH 'machine learning';
+
+-- 等价的 CONTAINS 函数
+SELECT title, content
+FROM documents
+WHERE CONTAINS(content, 'database systems');`}
+        explanations={[
+          { code: 'MATCH 语法', explanation: 'DuckDB 的全文搜索标准语法', tip: '支持复杂的查询表达式' },
+          { code: 'CONTAINS 函数', explanation: '另一种搜索语法，更接近传统 SQL', tip: '功能与 MATCH 基本相同' },
+          { code: '性能特点', explanation: '需要 FTS 索引才能发挥最佳性能', tip: '无索引时会进行顺序扫描' },
+        ]}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">查询操作符详解</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-xl border border-blue-200 dark:border-blue-700">
+          <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-3">🔍 基本操作符</h4>
+          <div className="space-y-3 text-sm">
+            <div>
+              <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded text-xs">keyword1 keyword2</code>
+              <span className="ml-2 text-blue-700 dark:text-blue-400">AND 操作（默认）</span>
+            </div>
+            <div>
+              <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded text-xs">keyword1 OR keyword2</code>
+              <span className="ml-2 text-blue-700 dark:text-blue-400">OR 操作</span>
+            </div>
+            <div>
+              <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded text-xs">keyword1 -keyword2</code>
+              <span className="ml-2 text-blue-700 dark:text-blue-400">NOT 操作</span>
+            </div>
+            <div>
+              <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded text-xs">"exact phrase"</code>
+              <span className="ml-2 text-blue-700 dark:text-blue-400">短语搜索</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-green-50 dark:bg-green-900/30 p-6 rounded-xl border border-green-200 dark:border-green-700">
+          <h4 className="font-bold text-green-800 dark:text-green-300 mb-3">⚡ 高级操作符</h4>
+          <div className="space-y-3 text-sm">
+            <div>
+              <code className="bg-green-100 dark:bg-green-900/50 px-2 py-1 rounded text-xs">keyword*</code>
+              <span className="ml-2 text-green-700 dark:text-green-400">前缀匹配</span>
+            </div>
+            <div>
+              <code className="bg-green-100 dark:bg-green-900/50 px-2 py-1 rounded text-xs">"word1 word2"~5</code>
+              <span className="ml-2 text-green-700 dark:text-green-400">邻近搜索（5词内）</span>
+            </div>
+            <div>
+              <code className="bg-green-100 dark:bg-green-900/50 px-2 py-1 rounded text-xs">(group1 OR group2)</code>
+              <span className="ml-2 text-green-700 dark:text-green-400">分组和优先级</span>
+            </div>
+            <div>
+              <code className="bg-green-100 dark:bg-green-900/50 px-2 py-1 rounded text-xs">field:keyword</code>
+              <span className="ml-2 text-green-700 dark:text-green-400">字段限定（高级）</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <CodeBlock
-        title="全文搜索语法"
-        code={`-- 基本全文搜索
-SELECT * FROM articles
-WHERE title MATCH 'machine learning';
+        title="高级搜索查询示例"
+        code={`-- 复杂布尔查询
+SELECT title, author, publish_date
+FROM articles
+WHERE content MATCH '("machine learning" OR "artificial intelligence") AND python -tutorial';
 
--- 使用 CONTAINS 函数
-SELECT * FROM documents
-WHERE CONTAINS(content, 'database');
+-- 邻近搜索：查找包含"database"和"performance"的文章，且两个词相隔不超过3个词
+SELECT title, content
+FROM articles
+WHERE content MATCH '"database performance"~3';
 
--- 多个关键词搜索
-SELECT * FROM posts
-WHERE title MATCH 'SQL OR database OR query';
+-- 混合查询：包含"SQL"但不包含"basic"的高级文章
+SELECT title, level, tags
+FROM tutorials
+WHERE content MATCH 'SQL -basic'
+  AND level IN ('intermediate', 'advanced');
 
--- 短语搜索
-SELECT * FROM books
-WHERE description MATCH '"machine learning"';`}
+-- 带权重的多字段搜索
+SELECT
+    title,
+    MATCH_RELEVANCE(title, 'SQL') * 3 +
+    MATCH_RELEVANCE(content, 'SQL') * 1 +
+    MATCH_RELEVANCE(tags, 'SQL') * 2 AS relevance_score
+FROM articles
+WHERE title MATCH 'SQL' OR content MATCH 'SQL' OR tags MATCH 'SQL'
+ORDER BY relevance_score DESC;`}
         {...noteProps('code1')}
       />
 
-      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">高级搜索特性</h3>
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">相关性排序和评分</h3>
 
       <CodeBlock
-        title="搜索操作符"
-        code={`-- AND 操作（默认）
-SELECT * FROM articles WHERE content MATCH 'SQL database';
+        title="相关性评分系统"
+        code={`-- 基础相关性评分
+SELECT
+    title,
+    author,
+    MATCH_RELEVANCE(content, 'machine learning') AS relevance_score,
+    LENGTH(content) AS content_length
+FROM articles
+WHERE content MATCH 'machine learning'
+ORDER BY relevance_score DESC, LENGTH(content) DESC;
 
--- OR 操作
-SELECT * FROM articles WHERE content MATCH 'SQL OR database';
+-- 多字段加权评分
+SELECT
+    title,
+    -- 标题权重3倍，内容权重1倍，标签权重2倍
+    (MATCH_RELEVANCE(title, 'database') * 3 +
+     MATCH_RELEVANCE(content, 'database') * 1 +
+     MATCH_RELEVANCE(tags, 'database') * 2) / 6 AS weighted_score,
 
--- NOT 操作
-SELECT * FROM articles WHERE content MATCH 'SQL -tutorial';
+    -- 匹配关键词数量
+    LENGTH(content) - LENGTH(REPLACE(LOWER(content), 'database', '')) AS match_count
+FROM articles
+WHERE title MATCH 'database' OR content MATCH 'database'
+ORDER BY weighted_score DESC, match_count DESC;
 
--- 短语搜索（连续的词）
-SELECT * FROM articles WHERE content MATCH '"machine learning"';
-
--- 通配符搜索
-SELECT * FROM articles WHERE content MATCH 'databas*';
-
--- 邻近搜索（词语相邻）
-SELECT * FROM articles WHERE content MATCH '"SQL database"~5';`}
+-- 时间衰减评分（新文章权重更高）
+SELECT
+    title,
+    publish_date,
+    MATCH_RELEVANCE(content, 'technology') AS base_score,
+    -- 时间权重：30天内的文章权重正常，超过30天的权重衰减
+    CASE
+        WHEN publish_date >= CURRENT_DATE - INTERVAL '30 days'
+        THEN 1.0
+        ELSE 0.3
+    END AS recency_weight,
+    MATCH_RELEVANCE(content, 'technology') *
+    CASE
+        WHEN publish_date >= CURRENT_DATE - INTERVAL '30 days'
+        THEN 1.0
+        ELSE 0.3
+    END AS final_score
+FROM articles
+WHERE content MATCH 'technology'
+ORDER BY final_score DESC;`}
         {...noteProps('code2')}
       />
 
-      <CodeBlock
-        title="相关性排序"
-        code={`-- 按相关性排序
-SELECT title, content,
-       MATCH_RELEVANCE(content, 'SQL database') AS relevance_score
-FROM articles
-WHERE content MATCH 'SQL database'
-ORDER BY relevance_score DESC;
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">全文索引优化</h3>
 
--- 带权重的搜索
-SELECT title,
-       (MATCH_RELEVANCE(title, 'SQL') * 2 +
-        MATCH_RELEVANCE(content, 'SQL')) / 3 AS weighted_score
-FROM articles
-WHERE title MATCH 'SQL' OR content MATCH 'SQL'
-ORDER BY weighted_score DESC;`}
-        {...noteProps('code3')}
-      />
+      <SQLExplainer
+        sql={`-- 创建全文搜索索引
+CREATE INDEX idx_articles_content ON articles USING FTS(content);
 
-      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">索引优化</h3>
-
-      <CodeBlock
-        title="创建全文索引"
-        code={`-- 创建全文索引
-CREATE INDEX idx_articles_content ON articles
-USING FTS(content);
-
--- 为多个列创建联合全文索引
+-- 多列联合索引
 CREATE INDEX idx_articles_fulltext ON articles
-USING FTS(title, content, tags);
+USING FTS(title, content, summary, tags);
 
--- 查看索引使用情况
-EXPLAIN QUERY PLAN
-SELECT * FROM articles
-WHERE content MATCH 'database';`}
-        {...noteProps('code4')}
+-- 查看索引信息
+PRAGMA table_info('articles');
+
+-- 分析查询计划
+EXPLAIN ANALYZE
+SELECT title, MATCH_RELEVANCE(content, 'database') AS score
+FROM articles
+WHERE content MATCH 'database'
+ORDER BY score DESC
+LIMIT 10;`}
+        explanations={[
+          { code: 'USING FTS(column)', explanation: '创建全文搜索专用索引', tip: 'FTS 索引使用倒排索引结构，搜索速度极快' },
+          { code: '多列索引', explanation: '可以为多个文本列创建联合索引', tip: '搜索时会在所有指定列中查找' },
+          { code: 'EXPLAIN ANALYZE', explanation: '分析查询是否使用了 FTS 索引', tip: '确保搜索查询使用索引而不是全表扫描' },
+        ]}
       />
 
-      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">分词和词干提取</h3>
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">分词和文本处理</h3>
 
       <CodeBlock
-        title="文本处理函数"
-        code={`-- 基本分词
-SELECT UNNEST(STRING_SPLIT(content, ' ')) AS words
+        title="文本预处理和分词"
+        code={`-- 创建测试数据
+CREATE TABLE articles AS
+SELECT *
+FROM (VALUES
+    (1, 'Machine Learning with Python', 'Python machine learning tutorial covers neural networks, deep learning, and AI algorithms in detail.'),
+    (2, 'Database Design Principles', 'Learn database normalization, indexing strategies, and query optimization techniques.'),
+    (3, 'Web Development Guide', 'Complete guide to HTML, CSS, JavaScript, React, and modern web development frameworks.')
+) AS t(id, title, content);
+
+-- 基本分词
+SELECT
+    id,
+    title,
+    UNNEST(STRING_SPLIT(LOWER(content), ' ')) AS word
 FROM articles
 WHERE id = 1;
 
--- 词干提取（stemming）
-SELECT word, STEM(word) AS stem
-FROM (SELECT UNNEST(STRING_SPLIT(content, ' ')) AS word
-      FROM articles WHERE id = 1);
+-- 词频统计（去除停用词）
+SELECT
+    word,
+    COUNT(*) AS frequency
+FROM (
+    SELECT UNNEST(STRING_SPLIT(LOWER(content), ' ')) AS word
+    FROM articles
+    WHERE content MATCH 'learning'
+) AS words
+WHERE word NOT IN ('the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'shall')
+  AND LENGTH(word) > 2
+GROUP BY word
+ORDER BY frequency DESC
+LIMIT 10;
 
--- 停用词过滤
-SELECT word
-FROM (SELECT UNNEST(STRING_SPLIT(content, ' ')) AS word
-      FROM articles WHERE id = 1)
-WHERE word NOT IN ('the', 'a', 'an', 'and', 'or', 'but', 'is', 'are');`}
+-- 词干提取（如果支持）
+-- 注意：DuckDB 可能需要扩展来支持高级词干提取
+SELECT
+    word,
+    CASE
+        WHEN word LIKE '%ing' THEN SUBSTRING(word, 1, LENGTH(word) - 3)
+        WHEN word LIKE '%ed' THEN SUBSTRING(word, 1, LENGTH(word) - 2)
+        WHEN word LIKE '%er' THEN SUBSTRING(word, 1, LENGTH(word) - 2)
+        WHEN word LIKE '%est' THEN SUBSTRING(word, 1, LENGTH(word) - 3)
+        WHEN word LIKE '%ly' THEN SUBSTRING(word, 1, LENGTH(word) - 2)
+        WHEN word LIKE '%s' AND LENGTH(word) > 3 THEN SUBSTRING(word, 1, LENGTH(word) - 1)
+        ELSE word
+    END AS stemmed
+FROM (
+    SELECT UNNEST(STRING_SPLIT(LOWER(content), ' ')) AS word
+    FROM articles
+    WHERE id = 1
+) AS words
+WHERE LENGTH(word) > 3;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">全文搜索在实际业务中的应用</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+          <h4 className="font-bold text-blue-700 dark:text-blue-300 mb-2">📄 文档管理系统</h4>
+          <p className="text-sm text-blue-600 dark:text-blue-400">搜索合同、报告、邮件等文档内容</p>
+          <code className="text-xs bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded mt-2 block">
+            WHERE content MATCH 'contract breach OR violation'
+          </code>
+        </div>
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-700">
+          <h4 className="font-bold text-green-700 dark:text-green-300 mb-2">🛒 电商搜索</h4>
+          <p className="text-sm text-green-600 dark:text-green-400">商品描述、评论、规格搜索</p>
+          <code className="text-xs bg-green-100 dark:bg-green-900/50 px-2 py-1 rounded mt-2 block">
+            WHERE description MATCH 'wireless bluetooth'
+          </code>
+        </div>
+        <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+          <h4 className="font-bold text-purple-700 dark:text-purple-300 mb-2">🎓 在线教育</h4>
+          <p className="text-sm text-purple-600 dark:text-purple-400">课程内容、问答、笔记搜索</p>
+          <code className="text-xs bg-purple-100 dark:bg-purple-900/50 px-2 py-1 rounded mt-2 block">
+            WHERE content MATCH 'machine learning -beginner'
+          </code>
+        </div>
+        <div className="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg border border-amber-200 dark:border-amber-700">
+          <h4 className="font-bold text-amber-700 dark:text-amber-300 mb-2">💬 客户支持</h4>
+          <p className="text-sm text-amber-600 dark:text-amber-400">工单、聊天记录、智能问答</p>
+          <code className="text-xs bg-amber-100 dark:bg-amber-900/50 px-2 py-1 rounded mt-2 block">
+            WHERE message MATCH 'refund OR return policy'
+          </code>
+        </div>
+      </div>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">性能优化和最佳实践</h3>
+
+      <InfoBox type="tip" title="全文搜索性能优化" {...noteProps('box4')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li><strong>索引策略：</strong> 为搜索频繁的列创建 FTS 索引</li>
+          <li><strong>查询优化：</strong> 使用短语搜索而不是通配符</li>
+          <li><strong>结果限制：</strong> 使用 LIMIT 控制返回结果数量</li>
+          <li><strong>增量更新：</strong> 对于大表考虑定期重建索引</li>
+          <li><strong>缓存策略：</strong> 缓存热门搜索词的结果</li>
+          <li><strong>分词优化：</strong> 预处理文本，去除停用词</li>
+        </ul>
+      </InfoBox>
+
+      <CodeBlock
+        title="高级搜索功能实现"
+        code={`-- 智能搜索：自动补全和纠错
+WITH search_suggestions AS (
+    SELECT
+        search_term,
+        -- 简单的编辑距离计算（Levenshtein）
+        LEVENSHTEIN(search_term, 'machine learning') AS distance,
+        search_term AS suggestion
+    FROM search_history
+    WHERE LEVENSHTEIN(search_term, 'machine learning') <= 3
+    ORDER BY distance
+    LIMIT 5
+)
+SELECT * FROM search_suggestions;
+
+-- 搜索分析和统计
+CREATE TABLE search_analytics AS
+SELECT
+    search_query,
+    COUNT(*) AS search_count,
+    AVG(result_count) AS avg_results,
+    AVG(search_time_ms) AS avg_response_time,
+    SUM(CASE WHEN clicked_results > 0 THEN 1 ELSE 0 END) AS successful_searches
+FROM search_logs
+WHERE search_date >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY search_query
+HAVING COUNT(*) >= 5
+ORDER BY search_count DESC;
+
+-- 基于用户行为的个性化搜索
+SELECT
+    a.title,
+    a.content,
+    -- 用户偏好权重
+    CASE
+        WHEN a.category IN (
+            SELECT category FROM user_preferences WHERE user_id = 123
+        ) THEN 1.5
+        ELSE 1.0
+    END *
+    -- 相关性评分
+    MATCH_RELEVANCE(a.content, 'database') AS personalized_score
+FROM articles a
+WHERE a.content MATCH 'database'
+ORDER BY personalized_score DESC;`}
+        {...noteProps('code4')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">全文搜索的局限性和替代方案</h3>
+
+      <InfoBox type="warning" title="全文搜索的局限性" {...noteProps('box5')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li><strong>语言支持：</strong> 对中文、日文等表意文字支持有限</li>
+          <li><strong>实时性：</strong> 索引更新可能有延迟</li>
+          <li><strong>存储开销：</strong> FTS 索引占用额外存储空间</li>
+          <li><strong>精确匹配：</strong> 不适合结构化数据的精确查询</li>
+          <li><strong>语义理解：</strong> 无法理解语义和上下文</li>
+        </ul>
+      </InfoBox>
+
+      <CodeBlock
+        title="全文搜索 vs 其他搜索方案"
+        code={`-- 全文搜索：自然语言查询
+SELECT title, MATCH_RELEVANCE(content, 'machine learning') AS score
+FROM articles
+WHERE content MATCH 'machine learning OR AI OR neural networks'
+ORDER BY score DESC;
+
+-- 传统 LIKE：精确字符串匹配
+SELECT title FROM articles
+WHERE LOWER(content) LIKE '%machine learning%'
+   OR LOWER(content) LIKE '%artificial intelligence%';
+
+-- 正则表达式：模式匹配
+SELECT title FROM articles
+WHERE REGEXP_MATCHES(content, '(machine learning|artificial intelligence|neural network)');
+
+-- 向量搜索（如果支持扩展）：语义相似性
+-- 需要安装向量扩展和预计算向量
+SELECT title,
+       COSINE_SIMILARITY(content_vector, query_vector) AS similarity
+FROM articles_with_vectors
+ORDER BY similarity DESC;
+
+-- 混合搜索：结合多种技术
+SELECT title,
+       MATCH_RELEVANCE(content, 'machine learning') AS text_score,
+       COSINE_SIMILARITY(content_vector, query_vector) AS semantic_score,
+       (text_score * 0.7 + semantic_score * 0.3) AS combined_score
+FROM articles_with_search
+WHERE content MATCH 'machine learning'
+ORDER BY combined_score DESC;`}
         {...noteProps('code5')}
       />
 
-      <InfoBox type="experiment" title="性能优化建议" {...noteProps('box1')}>
-        <ul className="list-disc ml-4 space-y-1">
-          <li>为经常搜索的列创建 FTS 索引</li>
-          <li>使用相关性评分进行结果排序</li>
-          <li>考虑分词和词干提取提高搜索质量</li>
-          <li>定期重建索引以保持搜索性能</li>
-        </ul>
+      <InfoBox type="experiment" title="动手练习" {...noteProps('box6')}>
+        <div className="space-y-3">
+          <p className="font-semibold">任务 1：构建文章搜索系统</p>
+          <p>创建一个文章表，实现全文搜索功能，包括相关性排序和多关键词搜索。</p>
+          <details className="mt-2">
+            <summary className="cursor-pointer text-purple-600 dark:text-purple-400">查看参考实现</summary>
+            <code className="block mt-2 bg-purple-100 dark:bg-purple-900 p-2 rounded text-sm whitespace-pre">
+{`-- 创建文章表
+CREATE TABLE articles (
+    id INTEGER PRIMARY KEY,
+    title VARCHAR(200),
+    content TEXT,
+    author VARCHAR(100),
+    publish_date DATE,
+    category VARCHAR(50)
+);
+
+-- 创建全文索引
+CREATE INDEX idx_articles_fts ON articles USING FTS(title, content);
+
+-- 搜索功能
+SELECT
+    title,
+    author,
+    publish_date,
+    MATCH_RELEVANCE(content, 'database') AS relevance_score
+FROM articles
+WHERE content MATCH 'database systems'
+ORDER BY relevance_score DESC
+LIMIT 10;`}
+            </code>
+          </details>
+
+          <p className="font-semibold">任务 2：实现搜索建议功能</p>
+          <p>基于搜索历史和编辑距离，实现搜索关键词的自动补全和纠错功能。</p>
+
+          <p className="font-semibold">任务 3：多语言全文搜索</p>
+          <p>探索如何处理中文、日文等多语言文本的全文搜索，包括分词和索引策略。</p>
+
+          <p className="font-semibold">任务 4：搜索引擎优化</p>
+          <p>分析搜索性能，优化索引策略，并实现搜索结果的缓存机制。</p>
+        </div>
       </InfoBox>
     </div>
   );
@@ -658,29 +985,269 @@ export function ApproximateComputingSection({ sectionId, addNote, updateNote, de
       <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"大数据集的高效近似算法"</p>
 
       <Paragraph {...noteProps('p1')}>
-        近似计算在大数据处理中非常重要。通过牺牲少量准确性来换取大幅的性能提升，适用于对精确结果要求不高的场景，如实时分析、趋势预测等。
+        在大数据时代，精确计算往往代价高昂。DuckDB 提供了丰富的近似计算函数，能够在保证结果质量的同时大幅提升查询性能。这些函数基于先进的概率算法，能够在数亿条数据上实现实时分析。
       </Paragraph>
 
-      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">近似聚合函数</h3>
+      <InfoBox type="fastai" title="为什么需要近似计算？" {...noteProps('box1')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li><strong>性能需求：</strong> 实时分析需要毫秒级响应</li>
+          <li><strong>资源限制：</strong> 完整扫描大数据集耗时耗资源</li>
+          <li><strong>业务容忍度：</strong> 很多场景下99%的准确性就够了</li>
+          <li><strong>成本效益：</strong> 近似算法通常比精确算法快100-1000倍</li>
+        </ul>
+      </InfoBox>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">近似计数：HyperLogLog</h3>
 
       <SQLExplainer
-        sql={`-- 近似计数（HyperLogLog算法）
+        sql={`-- 精确计数（慢）
+SELECT COUNT(DISTINCT user_id) AS exact_unique_users
+FROM events;
+
+-- 近似计数（快且省内存）
 SELECT APPROX_COUNT_DISTINCT(user_id) AS approx_unique_users
 FROM events;
 
--- 近似分位数
+-- 对比两种方法的差异
 SELECT
-    APPROXIMATE_PERCENTILE(salary, 0.5) AS median_salary,
-    APPROXIMATE_PERCENTILE(salary, 0.9) AS p90_salary,
-    APPROXIMATE_PERCENTILE(salary, 0.95) AS p95_salary
-FROM employees;`}
+    COUNT(DISTINCT user_id) AS exact_count,
+    APPROX_COUNT_DISTINCT(user_id) AS approx_count,
+    APPROX_COUNT_DISTINCT(user_id) - COUNT(DISTINCT user_id) AS difference
+FROM events;`}
+        explanations={[
+          { code: 'APPROX_COUNT_DISTINCT(column)', explanation: '使用 HyperLogLog 算法估算唯一值数量', tip: '内存使用仅与基数相关，不随数据量增长' },
+          { code: '精确度', explanation: '误差通常在 1-2% 以内，适合大数据集', tip: '对于小数据集，精确计数更快' },
+          { code: '性能优势', explanation: '内存使用量级更小，处理速度大幅提升', tip: '适合实时 UV、PV 统计' },
+        ]}
       />
 
-      <InfoBox type="experiment" title="动手练习" {...noteProps('box2')}>
-        <div className="space-y-2">
-          <p><strong>挑战 1：</strong> 实现一个基于采样的实时UV统计系统</p>
-          <p><strong>挑战 2：</strong> 创建近似分位数计算器，比较精确与近似结果的差异</p>
-          <p><strong>挑战 3：</strong> 构建一个自适应的近似计算系统，根据查询响应时间动态调整精度</p>
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">近似分位数计算</h3>
+
+      <CodeBlock
+        title="分位数统计"
+        code={`-- 精确分位数（需要全表扫描）
+SELECT
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary) AS exact_median,
+    PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY salary) AS exact_p90,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY salary) AS exact_p95
+FROM employees;
+
+-- 近似分位数（采样算法）
+SELECT
+    APPROXIMATE_PERCENTILE(salary, 0.5) AS approx_median,
+    APPROXIMATE_PERCENTILE(salary, 0.9) AS approx_p90,
+    APPROXIMATE_PERCENTILE(salary, 0.95) AS approx_p95
+FROM employees;
+
+-- 对比精确度和性能
+SELECT
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary) AS exact_median,
+    APPROXIMATE_PERCENTILE(salary, 0.5) AS approx_median,
+    ABS(APPROXIMATE_PERCENTILE(salary, 0.5) -
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary)) /
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary) * 100 AS error_percent
+FROM employees;`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">采样查询：USING SAMPLE</h3>
+
+      <CodeBlock
+        title="基于采样的分析"
+        code={`-- 随机采样分析（高效但有偏差）
+SELECT AVG(salary), STDDEV(salary), COUNT(*)
+FROM employees
+USING SAMPLE 10%;  -- 使用 10% 的数据
+
+-- 分层采样（更准确）
+SELECT department, AVG(salary), COUNT(*)
+FROM employees
+USING SAMPLE 100 ROWS BY department;  -- 每部门采样100行
+
+-- 系统采样（确定性采样）
+SELECT AVG(sales_amount), SUM(sales_amount)
+FROM sales
+USING SAMPLE 10000 ROWS;  -- 采样10000行进行分析
+
+-- 采样用于快速探索
+SELECT
+    product_category,
+    APPROXIMATE_PERCENTILE(price, 0.5) AS median_price,
+    APPROXIMATE_PERCENTILE(price, 0.9) AS p90_price
+FROM products
+USING SAMPLE 5 PERCENT
+GROUP BY product_category;`}
+        {...noteProps('code2')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">Top-K 近似算法</h3>
+
+      <CodeBlock
+        title="近似 Top-K 查询"
+        code={`-- 精确 Top-10（需要全表排序）
+SELECT product_name, sales_amount
+FROM products
+ORDER BY sales_amount DESC
+LIMIT 10;
+
+-- 近似 Top-10（使用采样）
+SELECT product_name, sales_amount
+FROM products
+USING SAMPLE 50 PERCENT
+ORDER BY sales_amount DESC
+LIMIT 10;
+
+-- 结合近似计数的使用模式分析
+WITH user_patterns AS (
+    SELECT
+        user_id,
+        APPROX_COUNT_DISTINCT(page_url) AS unique_pages_visited,
+        APPROX_COUNT_DISTINCT(session_id) AS total_sessions
+    FROM user_events
+    USING SAMPLE 10 PERCENT
+    GROUP BY user_id
+)
+SELECT
+    CASE
+        WHEN unique_pages_visited < 5 THEN '轻度用户'
+        WHEN unique_pages_visited < 20 THEN '中度用户'
+        ELSE '重度用户'
+    END AS user_segment,
+    COUNT(*) AS user_count,
+    AVG(total_sessions) AS avg_sessions
+FROM user_patterns
+GROUP BY user_segment;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">实时分析应用</h3>
+
+      <CodeBlock
+        title="实时仪表盘数据"
+        code={`-- 实时 UV 统计（每分钟更新）
+CREATE TABLE realtime_uv AS
+SELECT
+    CURRENT_TIMESTAMP AS time_window,
+    APPROX_COUNT_DISTINCT(user_id) AS unique_visitors,
+    COUNT(*) AS total_pageviews,
+    APPROX_COUNT_DISTINCT(session_id) AS active_sessions
+FROM user_events
+WHERE event_time >= CURRENT_TIMESTAMP - INTERVAL '1 minute';
+
+-- 实时销售监控
+CREATE TABLE sales_monitor AS
+SELECT
+    product_category,
+    APPROXIMATE_PERCENTILE(sales_amount, 0.5) AS median_sale,
+    APPROXIMATE_PERCENTILE(sales_amount, 0.95) AS p95_sale,
+    APPROX_COUNT_DISTINCT(customer_id) AS unique_customers
+FROM sales_transactions
+WHERE transaction_time >= CURRENT_TIMESTAMP - INTERVAL '1 hour'
+GROUP BY product_category;
+
+-- 性能监控：响应时间分布
+SELECT
+    endpoint,
+    APPROXIMATE_PERCENTILE(response_time_ms, 0.5) AS median_response,
+    APPROXIMATE_PERCENTILE(response_time_ms, 0.95) AS p95_response,
+    APPROXIMATE_PERCENTILE(response_time_ms, 0.99) AS p99_response
+FROM api_logs
+WHERE log_time >= CURRENT_TIMESTAMP - INTERVAL '5 minutes'
+GROUP BY endpoint;`}
+        {...noteProps('code4')}
+      />
+
+      <div className="overflow-x-auto my-6">
+        <table className="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700">
+          <thead>
+            <tr className="bg-slate-100 dark:bg-slate-800">
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">函数</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">精确度</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">性能提升</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">适用场景</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-600 dark:text-slate-300">
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">APPROX_COUNT_DISTINCT</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">±1-2%</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">10-100x</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">UV统计、基数估算</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">APPROXIMATE_PERCENTILE</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">±0.1-1%</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">5-50x</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">分位数分析、性能监控</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">USING SAMPLE</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">取决于采样率</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">采样率倍</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">数据探索、原型开发</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">Top-K 近似</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">高（&gt;95%）</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">2-10x</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">排行榜、推荐系统</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">近似计算的最佳实践</h3>
+
+      <InfoBox type="tip" title="选择合适的近似算法" {...noteProps('box2')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li><strong>明确精度要求：</strong> 业务能容忍多少误差？</li>
+          <li><strong>评估数据分布：</strong> 数据是否均匀分布影响近似精度</li>
+          <li><strong>考虑查询频率：</strong> 高频查询适合近似算法</li>
+          <li><strong>监控误差率：</strong> 定期验证近似结果的准确性</li>
+          <li><strong>渐进式应用：</strong> 先在非核心场景验证，再推广使用</li>
+        </ul>
+      </InfoBox>
+
+      <CodeBlock
+        title="自适应近似计算系统"
+        code={`-- 根据数据量自动选择算法
+CREATE FUNCTION smart_count_distinct(column_name) AS (
+    CASE
+        WHEN (SELECT COUNT(*) FROM table_name) < 1000000
+        THEN COUNT(DISTINCT column_name)  -- 小数据集用精确算法
+        ELSE APPROX_COUNT_DISTINCT(column_name)  -- 大数据集用近似算法
+    END
+);
+
+-- 根据响应时间动态调整采样率
+CREATE FUNCTION adaptive_sample(table_name, target_response_ms) AS (
+    -- 实现采样率自动调整逻辑
+    -- 如果查询太慢，自动增加采样率
+    -- 如果精度不够，减少采样率
+    USING SAMPLE (
+        CASE
+            WHEN last_response_time > target_response_ms THEN sample_rate * 1.2
+            WHEN error_rate > acceptable_error THEN sample_rate * 0.8
+            ELSE sample_rate
+        END
+    PERCENT
+    )
+);`}
+        {...noteProps('code5')}
+      />
+
+      <InfoBox type="experiment" title="动手练习" {...noteProps('box3')}>
+        <div className="space-y-3">
+          <div>
+            <p className="font-semibold">任务 1：性能对比实验</p>
+            <p>在不同大小的数据集上对比精确计算和近似计算的性能差异：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>创建包含100万行数据的测试表</li>
+              <li>分别用COUNT(DISTINCT)和APPROX_COUNT_DISTINCT计算唯一值</li>
+              <li>记录查询时间和内存使用</li>
+              <li>分析误差率与数据量的关系</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 2：实时监控仪表盘</p>
+            <p>构建一个实时用户行为分析仪表盘：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>实时计算在线用户数（APPROX_COUNT_DISTINCT）</li>
+              <li>响应时间分位数统计</li>
+              <li>热门页面访问Top-10</li>
+              <li>用户活跃度分布分析</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 3：A/B测试效果分析</p>
+            <p>使用近似算法优化A/B测试数据分析：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>实时计算各版本的转化率</li>
+              <li>使用分位数分析用户行为差异</li>
+              <li>快速识别显著性差异</li>
+              <li>采样验证避免过度分析</li>
+            </ul>
+          </div>
         </div>
       </InfoBox>
     </div>
@@ -707,19 +1274,211 @@ export function ArrayStructSection({ sectionId, addNote, updateNote, deleteNote,
       <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"复杂数据类型的处理艺术"</p>
 
       <Paragraph {...noteProps('p1')}>
-        现代数据处理经常需要处理复杂的嵌套结构。DuckDB 支持数组（ARRAY）和结构体（STRUCT）数据类型。
+        现代数据处理经常需要处理复杂的嵌套结构。DuckDB 支持数组（ARRAY）和结构体（STRUCT）数据类型，让你可以像处理对象一样处理关系型数据。
       </Paragraph>
 
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">数组（ARRAY）基础操作</h3>
+
       <CodeBlock
-        title="数组操作"
-        code={`SELECT [1, 2, 3] AS numbers;
-SELECT array_length([1, 2, 3]) AS len;
-SELECT list_extract([1, 2, 3], 1) AS first;`}
+        title="创建和访问数组"
+        code={`-- 创建数组字面量
+SELECT [1, 2, 3, 4, 5] AS numbers;
+SELECT ['apple', 'banana', 'orange'] AS fruits;
+
+-- 数组长度
+SELECT array_length([1, 2, 3]) AS len;  -- 结果: 3
+
+-- 访问数组元素（索引从1开始）
+SELECT list_extract([10, 20, 30], 1) AS first;     -- 10
+SELECT list_extract([10, 20, 30], 2) AS second;    -- 20
+SELECT list_extract([10, 20, 30], -1) AS last;     -- 30
+
+-- 数组切片
+SELECT list_slice([10, 20, 30, 40, 50], 2, 4) AS slice;  -- [20, 30, 40]`}
+        {...noteProps('code1')}
       />
 
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">数组操作函数</h3>
+
+      <CodeBlock
+        title="数组变换和过滤"
+        code={`-- 数组连接
+SELECT [1, 2] || [3, 4] AS combined;  -- [1, 2, 3, 4]
+
+-- 数组排序
+SELECT list_sort([3, 1, 4, 1, 5]) AS sorted;  -- [1, 1, 3, 4, 5]
+
+-- 数组去重
+SELECT list_distinct([1, 2, 2, 3, 3, 3]) AS unique;  -- [1, 2, 3]
+
+-- 数组过滤
+SELECT list_filter([1, 2, 3, 4, 5], x -> x > 3) AS filtered;  -- [4, 5]
+
+-- 数组变换
+SELECT list_transform([1, 2, 3], x -> x * 2) AS doubled;  -- [2, 4, 6]`}
+        {...noteProps('code2')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">结构体（STRUCT）数据类型</h3>
+
+      <CodeBlock
+        title="结构体创建和访问"
+        code={`-- 创建结构体
+SELECT {'name': 'John', 'age': 25, 'city': 'New York'} AS person;
+
+-- 结构体字段访问
+SELECT
+    person.name,
+    person.age,
+    person.city
+FROM (
+    SELECT {'name': 'John', 'age': 25, 'city': 'New York'} AS person
+) t;
+
+-- 使用点号访问
+SELECT
+    person->>'name' AS name,
+    person->>'age' AS age,
+    person->>'city' AS city
+FROM (
+    SELECT {'name': 'John', 'age': 25, 'city': 'New York'} AS person
+) t;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">嵌套结构处理</h3>
+
+      <CodeBlock
+        title="复杂嵌套数据"
+        code={`-- 包含数组的结构体
+SELECT {
+    'user_id': 123,
+    'name': 'Alice',
+    'tags': ['developer', 'python', 'sql'],
+    'projects': [
+        {'name': 'web-app', 'status': 'active'},
+        {'name': 'api', 'status': 'completed'}
+    ]
+} AS user_profile;
+
+-- 访问嵌套字段
+SELECT
+    user_profile->>'name' AS name,
+    list_extract(user_profile->>'tags', 1) AS first_tag,
+    (user_profile->>'projects')->>[1]->>'name' AS first_project
+FROM user_profiles;`}
+        {...noteProps('code4')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">UNNEST - 展开数组</h3>
+
+      <CodeBlock
+        title="数组展开为多行"
+        code={`-- 基础展开
+SELECT unnest([1, 2, 3, 4, 5]) AS number;
+-- 结果: 5行，每行一个数字
+
+-- 展开带索引
+SELECT
+    generate_series(1, array_length(tags)) AS idx,
+    unnest(tags) AS tag
+FROM (
+    SELECT ['red', 'blue', 'green'] AS tags
+) t;
+
+-- 多数组同时展开
+SELECT
+    unnest(['Alice', 'Bob', 'Charlie']) AS name,
+    unnest([25, 30, 35]) AS age
+AS combined;`}
+        {...noteProps('code5')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">实际应用场景</h3>
+
+      <CodeBlock
+        title="电商产品数据模型"
+        code={`-- 创建产品表（包含数组和结构体）
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR,
+    price DECIMAL(10,2),
+    tags VARCHAR[],  -- 标签数组
+    specifications JSON,  -- 规格结构体
+    reviews JSON[]  -- 评论数组
+);
+
+-- 插入示例数据
+INSERT INTO products VALUES (
+    1,
+    'MacBook Pro 16"',
+    2499.00,
+    ['laptop', 'apple', 'high-end'],  -- 标签
+    {                               -- 规格
+        'cpu': 'M2 Max',
+        'ram': '32GB',
+        'storage': '1TB SSD'
+    },
+    [                               -- 评论
+        {'user': 'Alice', 'rating': 5, 'comment': 'Great laptop!'},
+        {'user': 'Bob', 'rating': 4, 'comment': 'Good performance'}
+    ]
+);
+
+-- 查询产品标签
+SELECT
+    name,
+    unnest(tags) AS tag
+FROM products
+WHERE id = 1;
+
+-- 查找有特定标签的产品
+SELECT name, price
+FROM products
+WHERE list_contains(tags, 'apple');`}
+        {...noteProps('code6')}
+      />
+
+      <div className="overflow-x-auto my-6">
+        <table className="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700">
+          <thead>
+            <tr className="bg-slate-100 dark:bg-slate-800">
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">操作类型</th>
+              <th className="border border-slate-200 dark:border-slate-600 px-4 py-2 text-left text-slate-800 dark:text-slate-200">数组函数</th>
+              <th className="border border-slate-200 dark:border-slate-600 px-4 py-2 text-left text-slate-800 dark:text-slate-200">结构体函数</th>
+              <th className="border border-slate-200 dark:border-slate-600 px-4 py-2 text-left text-slate-800 dark:text-slate-200">说明</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-600 dark:text-slate-300">
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">创建</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">[], list_pack()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">{'{}'}, struct_pack()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">创建数组或结构体</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">访问</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">list_extract()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">struct_extract()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">提取元素或字段</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">长度</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">array_length()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">struct_type()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">获取长度或类型信息</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">变换</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">list_transform()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">struct_insert()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">变换或修改内容</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">展开</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">unnest()</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">N/A</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">将数组展开为多行</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <InfoBox type="experiment" title="动手练习" {...noteProps('box2')}>
-        <div className="space-y-2">
-          <p><strong>挑战 1：</strong> 设计一个完整的电商产品表，包含标签、规格等数组字段</p>
+        <div className="space-y-3">
+          <div>
+            <p className="font-semibold">任务 1：电商产品数据建模</p>
+            <p>创建一个包含标签数组和规格结构体的产品表，插入一些示例数据，然后写查询来：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>查找所有包含"电子产品"标签的产品</li>
+              <li>展开每个产品的所有标签为单独的行</li>
+              <li>提取所有产品的CPU规格进行统计</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 2：用户偏好分析</p>
+            <p>设计一个用户表包含兴趣标签数组，写查询分析：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>最受欢迎的兴趣标签Top 10</li>
+              <li>有多少用户对"编程"感兴趣</li>
+              <li>用户的兴趣标签多样性统计</li>
+            </ul>
+          </div>
         </div>
       </InfoBox>
     </div>
@@ -746,18 +1505,246 @@ export function NullHandlingSection({ sectionId, addNote, updateNote, deleteNote
       <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"三值逻辑与缺失数据的艺术"</p>
 
       <Paragraph {...noteProps('p1')}>
-        NULL 值代表缺失或未知的数据。在 SQL 中，NULL 的处理需要特别小心，因为它引入了三值逻辑。
+        NULL 值代表缺失或未知的数据。在 SQL 中，NULL 的处理需要特别小心，因为它引入了三值逻辑（TRUE、FALSE、UNKNOWN），而不是传统的二值逻辑。这让很多操作变得反直觉。
       </Paragraph>
 
+      <InfoBox type="warning" title="NULL 的三大特性" {...noteProps('box1')}>
+        <ul className="list-disc ml-4 space-y-1">
+          <li><strong>未知性：</strong> NULL 不是空字符串，也不是0，它是"未知"</li>
+          <li><strong>传染性：</strong> 任何与 NULL 的运算结果都是 NULL</li>
+          <li><strong>三值逻辑：</strong> 比较结果可能是 TRUE、FALSE 或 UNKNOWN</li>
+        </ul>
+      </InfoBox>
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">NULL 值检测</h3>
+
       <CodeBlock
-        title="NULL 处理函数"
-        code={`SELECT COALESCE(description, '暂无描述') AS safe_description;
-SELECT NULLIF(price, 0) AS price_no_zero;`}
+        title="IS NULL vs = NULL"
+        code={`-- ❌ 错误：NULL 不能用等号比较
+SELECT * FROM users WHERE email = NULL;  -- 不会返回任何行
+
+-- ✅ 正确：使用 IS NULL
+SELECT * FROM users WHERE email IS NULL;
+
+-- ✅ 正确：使用 IS NOT NULL
+SELECT * FROM users WHERE email IS NOT NULL;
+
+-- 检查多个字段
+SELECT * FROM products
+WHERE description IS NULL
+   OR price IS NULL
+   OR category IS NULL;`}
+        {...noteProps('code1')}
       />
 
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">NULL 处理函数</h3>
+
+      <SQLExplainer
+        sql={`SELECT
+    COALESCE(description, '暂无描述') AS safe_description,
+    COALESCE(price, 0) AS safe_price,
+    COALESCE(discount, 0.1, 0.0) AS discount_rate
+FROM products;`}
+        explanations={[
+          { code: 'COALESCE(description, \'暂无描述\')', explanation: '返回第一个非NULL值，如果都为NULL则返回默认值', tip: '相当于 IFNULL 或 NVL' },
+          { code: 'COALESCE(price, 0)', explanation: '如果price为NULL，返回0', tip: '常用于数值计算' },
+          { code: 'COALESCE(discount, 0.1, 0.0)', explanation: '依次检查多个值，返回第一个非NULL的', tip: '支持多个备选值' },
+        ]}
+      />
+
+      <CodeBlock
+        title="其他NULL处理函数"
+        code={`-- NULLIF: 如果两个参数相等返回NULL，否则返回第一个参数
+SELECT NULLIF(price, 0) AS price_no_zero FROM products;
+-- 如果price=0，返回NULL；否则返回price
+
+-- IFNULL: 简单版本的COALESCE（只接受两个参数）
+SELECT IFNULL(description, 'No description') FROM products;
+
+-- GREATEST 和 LEAST 处理NULL
+SELECT GREATEST(a, b, COALESCE(c, 0)) FROM table1;  -- c为NULL时使用0
+SELECT LEAST(a, b, COALESCE(c, 999)) FROM table1;   -- c为NULL时使用999`}
+        {...noteProps('code2')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">聚合函数与NULL</h3>
+
+      <CodeBlock
+        title="聚合函数如何处理NULL"
+        code={`-- 创建测试数据
+CREATE TABLE sales (
+    product_id INTEGER,
+    amount DECIMAL(10,2)
+);
+
+INSERT INTO sales VALUES
+    (1, 100.00),
+    (1, NULL),     -- 空值
+    (2, 200.00),
+    (2, NULL),
+    (3, NULL);     -- 全部为空
+
+-- COUNT(*) vs COUNT(column)
+SELECT
+    COUNT(*) AS total_rows,        -- 5（包括NULL行）
+    COUNT(amount) AS non_null_count -- 2（只计算非NULL值）
+FROM sales;
+
+-- 其他聚合函数忽略NULL
+SELECT
+    SUM(amount) AS total_sales,     -- 300.00（忽略NULL）
+    AVG(amount) AS avg_sales,       -- 150.00（只计算非NULL值的平均）
+    MIN(amount) AS min_sales,       -- 100.00
+    MAX(amount) AS max_sales        -- 200.00
+FROM sales;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">JOIN操作中的NULL</h3>
+
+      <CodeBlock
+        title="外连接中的NULL处理"
+        code={`-- LEFT JOIN 会产生NULL值
+SELECT
+    u.user_id,
+    u.name,
+    COALESCE(o.total_orders, 0) AS total_orders,
+    COALESCE(o.total_amount, 0) AS total_amount
+FROM users u
+LEFT JOIN (
+    SELECT
+        user_id,
+        COUNT(*) AS total_orders,
+        SUM(amount) AS total_amount
+    FROM orders
+    GROUP BY user_id
+) o ON u.user_id = o.user_id;
+
+-- 处理NULL的外键
+SELECT * FROM orders
+WHERE user_id IS NULL;  -- 找不到对应用户的订单
+
+-- 使用COALESCE处理计算结果
+SELECT
+    product_name,
+    COALESCE(AVG(rating), 0) AS avg_rating,
+    COALESCE(COUNT(review_id), 0) AS review_count
+FROM products p
+LEFT JOIN reviews r ON p.product_id = r.product_id
+GROUP BY product_name;`}
+        {...noteProps('code4')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">NULL值排序</h3>
+
+      <CodeBlock
+        title="NULL在排序中的位置"
+        code={`-- 默认情况下，NULL值在排序时被认为最大
+SELECT * FROM products
+ORDER BY price;  -- NULL值排在最后
+
+-- 明确指定NULL的位置
+SELECT * FROM products
+ORDER BY price NULLS FIRST;   -- NULL值排在前面
+
+SELECT * FROM products
+ORDER BY price NULLS LAST;    -- NULL值排在后面（默认）
+
+-- 多列排序时NULL的处理
+SELECT * FROM products
+ORDER BY
+    COALESCE(category, '未分类') ASC,  -- NULL分类当作'未分类'
+    price NULLS LAST;                  -- NULL价格排在后面`}
+        {...noteProps('code5')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">NULL值的数据质量检查</h3>
+
+      <CodeBlock
+        title="数据质量分析"
+        code={`-- 检查每列的NULL值比例
+SELECT
+    'users' AS table_name,
+    COUNT(*) AS total_rows,
+    COUNT(CASE WHEN email IS NULL THEN 1 END) AS null_emails,
+    ROUND(100.0 * COUNT(CASE WHEN email IS NULL THEN 1 END) / COUNT(*), 2) AS null_email_pct,
+    COUNT(CASE WHEN phone IS NULL THEN 1 END) AS null_phones,
+    ROUND(100.0 * COUNT(CASE WHEN phone IS NULL THEN 1 END) / COUNT(*), 2) AS null_phone_pct
+FROM users;
+
+-- 识别数据完整性问题
+SELECT
+    column_name,
+    null_count,
+    total_count,
+    CASE
+        WHEN null_pct > 50 THEN '严重缺失'
+        WHEN null_pct > 20 THEN '部分缺失'
+        WHEN null_pct > 0 THEN '轻微缺失'
+        ELSE '完整'
+    END AS completeness_status
+FROM (
+    SELECT
+        'email' AS column_name,
+        COUNT(CASE WHEN email IS NULL THEN 1 END) AS null_count,
+        COUNT(*) AS total_count,
+        ROUND(100.0 * COUNT(CASE WHEN email IS NULL THEN 1 END) / COUNT(*), 2) AS null_pct
+    FROM users
+) quality_check;`}
+        {...noteProps('code6')}
+      />
+
+      <div className="overflow-x-auto my-6">
+        <table className="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700">
+          <thead>
+            <tr className="bg-slate-100 dark:bg-slate-800">
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">函数</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">语法</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">作用</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">示例</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-600 dark:text-slate-300">
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">COALESCE</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">COALESCE(val1, val2, ...)</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">返回第一个非NULL值</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">COALESCE(price, 0)</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">NULLIF</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">NULLIF(val1, val2)</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">如果相等返回NULL</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">NULLIF(price, 0)</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">IFNULL</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">IFNULL(val, default)</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">NULL替换为默认值</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">IFNULL(name, 'Unknown')</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">IS NULL</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">column IS NULL</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">检查是否为NULL</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">WHERE email IS NULL</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <InfoBox type="experiment" title="动手练习" {...noteProps('box2')}>
-        <div className="space-y-2">
-          <p><strong>挑战 1：</strong> 设计一个完整的NULL值处理策略</p>
+        <div className="space-y-3">
+          <div>
+            <p className="font-semibold">任务 1：电商数据NULL值处理</p>
+            <p>为一个电商数据库设计完整的NULL值处理策略：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>产品价格为NULL时的默认处理</li>
+              <li>用户地址信息缺失的处理</li>
+              <li>订单状态为NULL时的业务逻辑</li>
+              <li>统计报告中NULL值的展示方式</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 2：数据质量报告</p>
+            <p>创建一个数据质量检查脚本：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>检查每张表每列的NULL值比例</li>
+              <li>识别数据完整性问题</li>
+              <li>生成数据质量评分</li>
+              <li>提供改进建议</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 3：三值逻辑练习</p>
+            <p>写查询测试三值逻辑的行为：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>NULL与NULL的比较结果</li>
+              <li>NOT (NULL = NULL) 的结果</li>
+              <li>NULL AND TRUE 的结果</li>
+              <li>在WHERE子句中使用UNKNOWN的后果</li>
+            </ul>
+          </div>
         </div>
       </InfoBox>
     </div>
@@ -784,17 +1771,285 @@ export function SpatialFunctionsSection({ sectionId, addNote, updateNote, delete
       <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 italic">"位置数据的查询与分析"</p>
 
       <Paragraph {...noteProps('p1')}>
-        地理空间数据无处不在：GPS定位、地图服务、地理围栏、路径规划等。DuckDB 支持丰富的地理空间函数。
+        地理空间数据无处不在：GPS定位、地图服务、地理围栏、路径规划等。DuckDB 通过 PostGIS 兼容的函数支持丰富的地理空间操作，从简单的距离计算到复杂的几何分析。
       </Paragraph>
 
-      <CodeBlock
-        title="距离计算"
-          code={`SELECT ST_Distance(point1, point2) AS distance;`}
-        />
+      <InfoBox type="info" title="安装空间扩展" {...noteProps('box1')}>
+        <p>DuckDB 的地理空间功能通过扩展提供。在使用前需要安装：</p>
+        <code className="block mt-2 bg-slate-100 dark:bg-slate-800 p-2 rounded text-sm">
+          INSTALL spatial;<br/>
+          LOAD spatial;
+        </code>
+      </InfoBox>
 
-        <InfoBox type="experiment" title="动手练习" {...noteProps('box2')}>
-        <div className="space-y-2">
-          <p><strong>挑战 1：</strong> 构建一个完整的地理位置搜索系统</p>
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">几何数据类型</h3>
+
+      <CodeBlock
+        title="创建几何对象"
+        code={`-- 点（Point）
+SELECT ST_Point(116.4074, 39.9042) AS beijing_location;
+-- WGS84坐标：东经116.4074°, 北纬39.9042°
+
+-- 线段（LineString）
+SELECT ST_LineString([
+    [116.4074, 39.9042],  -- 北京
+    [121.4737, 31.2304],  -- 上海
+    [114.0579, 22.5431]   -- 深圳
+]) AS route;
+
+-- 多边形（Polygon）
+SELECT ST_Polygon('POLYGON((0 0, 4 0, 4 4, 0 4, 0 0))') AS square;
+
+-- 从WKT创建几何对象
+SELECT ST_GeomFromText('POINT(116.4074 39.9042)') AS point_from_wkt;
+SELECT ST_GeomFromText('LINESTRING(0 0, 1 1, 2 0)') AS line_from_wkt;`}
+        {...noteProps('code1')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">距离计算</h3>
+
+      <SQLExplainer
+        sql={`-- 计算两点间的距离
+SELECT
+    ST_Distance(
+        ST_Point(116.4074, 39.9042),  -- 北京
+        ST_Point(121.4737, 31.2304)   -- 上海
+    ) AS distance_meters;
+
+-- 计算球面距离（更准确）
+SELECT
+    ST_DistanceSphere(
+        ST_Point(116.4074, 39.9042),
+        ST_Point(121.4737, 31.2304)
+    ) AS distance_meters_sphere;`}
+        explanations={[
+          { code: 'ST_Distance(point1, point2)', explanation: '计算两几何对象间的欧几里得距离', tip: '平面坐标系适用' },
+          { code: 'ST_DistanceSphere(point1, point2)', explanation: '计算球面距离，使用WGS84椭球体', tip: '地理坐标系适用，结果为米' },
+        ]}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">空间关系判断</h3>
+
+      <CodeBlock
+        title="几何对象间的空间关系"
+        code={`-- 创建测试几何对象
+WITH geometries AS (
+    SELECT
+        ST_Point(0, 0) AS point,
+        ST_Polygon('POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))') AS square,
+        ST_Point(1, 1) AS point_inside,
+        ST_Point(3, 3) AS point_outside
+)
+SELECT
+    -- 包含关系
+    ST_Contains(square, point_inside) AS square_contains_point_inside,
+    ST_Contains(square, point_outside) AS square_contains_point_outside,
+
+    -- 相交关系
+    ST_Intersects(square, point_inside) AS square_intersects_point_inside,
+
+    -- 内部关系
+    ST_Within(point_inside, square) AS point_inside_within_square,
+
+    -- 距离关系
+    ST_DWithin(square, point_outside, 2.0) AS within_2_units
+FROM geometries;`}
+        {...noteProps('code2')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">几何操作</h3>
+
+      <CodeBlock
+        title="几何对象的变换和操作"
+        code={`-- 缓冲区（Buffer）
+SELECT ST_Buffer(ST_Point(0, 0), 1.0) AS point_buffer;
+-- 在点周围创建半径为1的圆形缓冲区
+
+-- 凸包（Convex Hull）
+SELECT ST_ConvexHull(ST_GeomFromText(
+    'MULTIPOINT((0 0), (1 0), (1 1), (0 1), (0.5 0.5))'
+)) AS convex_hull;
+
+-- 几何简化（Simplification）
+SELECT ST_Simplify(
+    ST_GeomFromText('LINESTRING(0 0, 0.1 0.1, 0.2 0.2, 0.3 0.3)'),
+    0.2  -- 容差
+) AS simplified_line;
+
+-- 几何联合（Union）
+SELECT ST_Union(
+    ST_Polygon('POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))'),
+    ST_Polygon('POLYGON((1 1, 3 1, 3 3, 1 3, 1 1))')
+) AS union_result;`}
+        {...noteProps('code3')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">坐标系转换</h3>
+
+      <CodeBlock
+        title="坐标系变换"
+        code={`-- WGS84转Web墨卡托
+SELECT ST_Transform(
+    ST_Point(116.4074, 39.9042),  -- 北京坐标 (WGS84)
+    3857  -- Web墨卡托投影坐标系
+) AS web_mercator_point;
+
+-- 坐标系转换
+SELECT ST_Transform(
+    ST_SetSRID(ST_Point(116.4074, 39.9042), 4326),  -- 设置源坐标系
+    3857  -- 目标坐标系
+) AS transformed_point;
+
+-- 获取几何对象的坐标系
+SELECT ST_SRID(ST_Point(116.4074, 39.9042)) AS srid;
+
+-- 设置坐标系
+SELECT ST_SetSRID(ST_Point(116.4074, 39.9042), 4326) AS point_with_srid;`}
+        {...noteProps('code4')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">地理空间索引</h3>
+
+      <CodeBlock
+        title="创建空间索引"
+        code={`-- 创建包含位置信息的表
+CREATE TABLE locations (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR,
+    location GEOMETRY
+);
+
+-- 创建空间索引
+CREATE INDEX idx_locations_geom ON locations USING RTREE (location);
+
+-- 插入测试数据
+INSERT INTO locations VALUES
+    (1, '北京', ST_Point(116.4074, 39.9042)),
+    (2, '上海', ST_Point(121.4737, 31.2304)),
+    (3, '深圳', ST_Point(114.0579, 22.5431));
+
+-- 使用空间索引的查询
+SELECT name
+FROM locations
+WHERE ST_DWithin(location, ST_Point(116.4074, 39.9042), 500000);  -- 500km范围内`}
+        {...noteProps('code5')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">实际应用：附近地点搜索</h3>
+
+      <CodeBlock
+        title="附近地点搜索系统"
+        code={`-- 创建餐馆位置表
+CREATE TABLE restaurants (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR,
+    cuisine VARCHAR,
+    location GEOMETRY,
+    rating DECIMAL(2,1)
+);
+
+-- 插入测试数据
+INSERT INTO restaurants VALUES
+    (1, '北京烤鸭店', '中餐', ST_Point(116.4074, 39.9042), 4.5),
+    (2, '意大利餐厅', '西餐', ST_Point(116.4174, 39.9142), 4.2),
+    (3, '日本料理', '日餐', ST_Point(116.4274, 39.9242), 4.8);
+
+-- 查找用户位置附近的餐馆
+WITH user_location AS (
+    SELECT ST_Point(116.4074, 39.9042) AS loc
+)
+SELECT
+    r.name,
+    r.cuisine,
+    r.rating,
+    ST_DistanceSphere(r.location, u.loc) / 1000 AS distance_km,
+    ST_DistanceSphere(r.location, u.loc) AS distance_meters
+FROM restaurants r
+CROSS JOIN user_location u
+WHERE ST_DWithin(r.location, u.loc, 5000)  -- 5km范围内
+ORDER BY distance_meters
+LIMIT 10;`}
+        {...noteProps('code6')}
+      />
+
+      <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">地理围栏应用</h3>
+
+      <CodeBlock
+        title="地理围栏判断"
+        code={`-- 定义商业区围栏
+WITH business_district AS (
+    SELECT ST_Polygon('POLYGON((
+        116.3 39.8, 116.5 39.8, 116.5 40.0, 116.3 40.0, 116.3 39.8
+    ))') AS boundary
+),
+user_locations AS (
+    SELECT
+        user_id,
+        ST_Point(longitude, latitude) AS location
+    FROM user_tracking
+    WHERE timestamp >= CURRENT_TIMESTAMP - INTERVAL '1 hour'
+)
+SELECT
+    u.user_id,
+    ST_Contains(b.boundary, u.location) AS is_in_district,
+    ST_Distance(b.boundary, u.location) AS distance_to_boundary
+FROM user_locations u
+CROSS JOIN business_district b;`}
+        {...noteProps('code7')}
+      />
+
+      <div className="overflow-x-auto my-6">
+        <table className="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700">
+          <thead>
+            <tr className="bg-slate-100 dark:bg-slate-800">
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">函数类别</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">常用函数</th>
+              <th className="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left text-slate-800 dark:text-slate-200">说明</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-600 dark:text-slate-300">
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">几何构造</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">ST_Point, ST_Polygon, ST_LineString</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">创建几何对象</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">距离计算</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">ST_Distance, ST_DistanceSphere</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">计算几何对象间距离</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">空间关系</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">ST_Contains, ST_Intersects, ST_Within</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">判断几何对象间的空间关系</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">几何操作</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">ST_Buffer, ST_Union, ST_Intersection</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">几何对象的变换和组合</td></tr>
+            <tr><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">坐标转换</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">ST_Transform, ST_SetSRID</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">坐标系转换</td></tr>
+            <tr className="bg-slate-50 dark:bg-slate-800"><td className="border border-slate-200 dark:border-slate-700 px-4 py-2 font-mono">属性获取</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">ST_Area, ST_Length, ST_Centroid</td><td className="border border-slate-200 dark:border-slate-700 px-4 py-2">获取几何对象的属性</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <InfoBox type="experiment" title="动手练习" {...noteProps('box2')}>
+        <div className="space-y-3">
+          <div>
+            <p className="font-semibold">任务 1：附近地点搜索</p>
+            <p>构建一个餐馆搜索系统：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>创建餐馆表包含位置信息</li>
+              <li>实现按距离排序的搜索功能</li>
+              <li>添加菜系过滤和评分排序</li>
+              <li>计算用户到餐馆的距离</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 2：地理围栏监控</p>
+            <p>实现一个地理围栏系统：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>定义商业区的边界多边形</li>
+              <li>监控用户是否进入/离开围栏</li>
+              <li>统计围栏内的用户数量</li>
+              <li>计算用户到边界的距离</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold">任务 3：路径规划辅助</p>
+            <p>创建路径分析工具：</p>
+            <ul className="list-disc ml-4 text-sm space-y-1">
+              <li>计算两点间的球面距离</li>
+              <li>创建路径的LineString对象</li>
+              <li>计算路径的总长度</li>
+              <li>判断路径是否经过特定区域</li>
+            </ul>
+          </div>
         </div>
       </InfoBox>
     </div>

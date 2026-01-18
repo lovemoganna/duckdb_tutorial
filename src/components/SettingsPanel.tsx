@@ -11,6 +11,20 @@ interface SettingsPanelProps {
   totalSections: number;
   totalTime: number;
   onResetProgress: () => void;
+  // Toolbar actions
+  onOpenPlayground: () => void;
+  onOpenOntologyGraph: () => void;
+  onOpenSQLCompare: () => void;
+  onOpenQuiz: () => void;
+  onOpenQuickRef: () => void;
+  onOpenFlashcards: () => void;
+  onOpenLearningPath: () => void;
+  onOpenAchievements: () => void;
+  onOpenGlossary: () => void;
+  onOpenDashboard: () => void;
+  onOpenProjectWorkspace: () => void;
+  onOpenLearningAssistant: () => void;
+  onOpenCodeReview: () => void;
 }
 
 export function SettingsPanel({
@@ -24,6 +38,19 @@ export function SettingsPanel({
   totalSections,
   totalTime,
   onResetProgress,
+  onOpenPlayground,
+  onOpenOntologyGraph,
+  onOpenSQLCompare,
+  onOpenQuiz,
+  onOpenQuickRef,
+  onOpenFlashcards,
+  onOpenLearningPath,
+  onOpenAchievements,
+  onOpenGlossary,
+  onOpenDashboard,
+  onOpenProjectWorkspace,
+  onOpenLearningAssistant,
+  onOpenCodeReview,
 }: SettingsPanelProps) {
   if (!isOpen) return null;
 
@@ -150,6 +177,156 @@ export function SettingsPanel({
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* 工具栏 */}
+          <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3">🛠️ 学习工具</h3>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={onOpenPlayground}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🎮</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">SQL 练习场</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">交互式 SQL 练习</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenOntologyGraph}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🕸️</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">本体论概念图</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">概念关系可视化</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenSQLCompare}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">⚖️</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">SQL 语法对比</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">不同数据库对比</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenQuiz}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🎯</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">知识测验</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">测试学习成果</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenQuickRef}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">📋</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">SQL 快速参考</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">常用语法参考</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenFlashcards}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🃏</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">闪卡复习</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">记忆强化工具</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenLearningPath}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🗺️</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">学习路径</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">个性化学习路线</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenAchievements}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🏆</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">成就系统</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">学习成就展示</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenGlossary}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">📖</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">术语表</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">专业术语解释</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenDashboard}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">📊</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">学习仪表盘</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">学习数据分析</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenProjectWorkspace}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">💻</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">项目工作区</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">综合项目环境</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenLearningAssistant}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🤖</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">学习助手</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">AI 智能辅导</div>
+                </div>
+              </button>
+
+              <button
+                onClick={onOpenCodeReview}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-left"
+              >
+                <span className="text-lg">🔍</span>
+                <div>
+                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">代码审查</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">代码质量检查</div>
+                </div>
+              </button>
             </div>
           </div>
 

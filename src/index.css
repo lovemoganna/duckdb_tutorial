@@ -1,10 +1,13 @@
+/* Google Fonts 导入 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Victor+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 @import "tailwindcss";
 
 /* ========================================
    全局字体设置
    ======================================== */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Noto Sans SC', 'Victor Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -13,7 +16,7 @@ body {
    代码字体
    ======================================== */
 code, pre, .font-mono {
-  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, Monaco, 'Courier New', monospace;
+  font-family: 'Victor Mono', 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, Monaco, 'Courier New', monospace;
 }
 
 /* ========================================
@@ -44,6 +47,166 @@ code, pre, .font-mono {
 
 .dark ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #475569 0%, #334155 100%);
+}
+
+/* ========================================
+   设计系统增强
+   ======================================== */
+
+/* 统一的间距系统 */
+.spacing-xs { margin: 0.25rem; }
+.spacing-sm { margin: 0.5rem; }
+.spacing-md { margin: 1rem; }
+.spacing-lg { margin: 1.5rem; }
+.spacing-xl { margin: 2rem; }
+.spacing-2xl { margin: 3rem; }
+
+/* 统一的圆角系统 */
+.radius-sm { border-radius: 0.375rem; }
+.radius-md { border-radius: 0.5rem; }
+.radius-lg { border-radius: 0.75rem; }
+.radius-xl { border-radius: 1rem; }
+
+/* 统一的阴影系统 */
+.shadow-soft { box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1); }
+.shadow-medium { box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15); }
+.shadow-strong { box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.2); }
+
+/* 统一的动画系统 */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-bounce-soft {
+  animation: bounceSoft 2s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceSoft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 统一的交互效果 */
+.interactive-element {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-element:hover {
+  transform: translateY(-1px);
+}
+
+.interactive-element:active {
+  transform: translateY(0);
+}
+
+/* 统一的焦点样式 */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-800;
+}
+
+/* 渐变文本效果 */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 卡片悬停效果 */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* 页面进入动画 */
+.page-enter {
+  animation: pageEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 侧边栏进入动画 */
+.sidebar-enter {
+  animation: sidebarEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sidebarEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 导航进入动画 */
+.nav-enter {
+  animation: navEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes navEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ========================================
@@ -652,14 +815,167 @@ select:focus-visible {
 .stat-card:nth-child(4) { animation: stat-count 0.5s ease-out 0.4s both; }
 
 /* ========================================
-   响应式优化
+   移动端优化
    ======================================== */
+
+/* 移动端基础适配 */
 @media (max-width: 768px) {
+  /* 全局移动端优化 */
+  body {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* 容器优化 */
+  .container-mobile {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* 卡片移动端优化 */
+  .card-mobile {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+  }
+
+  /* 按钮移动端优化 */
+  .btn-mobile {
+    min-height: 44px; /* iOS 推荐的最小触摸区域 */
+    padding: 12px 16px;
+    font-size: 16px; /* 防止 iOS 缩放 */
+  }
+
+  /* 输入框移动端优化 */
+  .input-mobile {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  /* 导航栏移动端优化 */
+  .nav-mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    z-index: 1000;
+  }
+
+  .dark .nav-mobile {
+    background: rgba(30, 41, 59, 0.95);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* 侧边栏移动端优化 */
+  .sidebar-mobile {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    overflow-y: auto;
+  }
+
+  .sidebar-mobile.open {
+    transform: translateX(280px);
+  }
+
+  .dark .sidebar-mobile {
+    background: #1e293b;
+  }
+
+  /* 模态框移动端优化 */
+  .modal-mobile {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    border-radius: 16px;
+  }
+
+  .modal-mobile-full {
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  /* 表格移动端优化 */
+  .table-mobile {
+    font-size: 14px;
+  }
+
+  .table-mobile th,
+  .table-mobile td {
+    padding: 8px 4px;
+    white-space: nowrap;
+  }
+
+  /* 搜索框移动端优化 */
+  .search-mobile {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px 16px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .search-mobile {
+    background: #1e293b;
+  }
+
+  /* 标签页移动端优化 */
+  .tabs-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabs-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 网格布局移动端优化 */
+  .grid-mobile-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-mobile-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-mobile-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* 文字移动端优化 */
+  .text-mobile-xs { font-size: 0.75rem; }
+  .text-mobile-sm { font-size: 0.875rem; }
+  .text-mobile-base { font-size: 1rem; }
+  .text-mobile-lg { font-size: 1.125rem; }
+  .text-mobile-xl { font-size: 1.25rem; }
+
+  /* 间距移动端优化 */
+  .spacing-mobile-xs { margin: 0.25rem; }
+  .spacing-mobile-sm { margin: 0.5rem; }
+  .spacing-mobile-md { margin: 1rem; }
+  .spacing-mobile-lg { margin: 1.5rem; }
+  .spacing-mobile-xl { margin: 2rem; }
+
+  /* 渐变背景移动端优化 */
   .gradient-bg,
   .gradient-bg-alt {
     background-size: 200% 200%;
+    background-attachment: fixed;
   }
 
+  /* 卡片悬停效果移动端禁用 */
   .card-hover:hover {
     transform: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -667,6 +983,158 @@ select:focus-visible {
 
   .dark .card-hover:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 本体感交互移动端调整 */
+  .interactive-surface:hover {
+    transform: none;
+  }
+
+  .btn-ontological:hover {
+    transform: none;
+  }
+
+  .card-ontological:hover {
+    transform: none;
+  }
+
+  .nav-item-ontological:hover {
+    transform: none;
+  }
+
+  .badge-ontological:hover {
+    transform: none;
+  }
+
+  .input-ontological:focus {
+    transform: none;
+  }
+}
+
+/* 平板适配 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container-tablet {
+    max-width: 768px;
+    margin: 0 auto;
+  }
+
+  .grid-tablet-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-tablet-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-tablet-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 触摸设备禁用悬停效果 */
+  .card-hover:hover,
+  .interactive-surface:hover,
+  .btn-ontological:hover,
+  .card-ontological:hover,
+  .nav-item-ontological:hover,
+  .badge-ontological:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 增加触摸目标大小 */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 优化滚动体验 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* 高对比度模式移动端支持 */
+@media (max-width: 768px) and (prefers-contrast: high) {
+  .gradient-bg,
+  .gradient-bg-alt {
+    background: #000;
+    animation: none;
+  }
+
+  .glass {
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #fff;
+  }
+
+  .dark .glass {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #000;
+  }
+}
+
+/* 深色模式移动端优化 */
+@media (max-width: 768px) {
+  .dark .nav-mobile {
+    background: rgba(30, 41, 59, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .sidebar-mobile {
+    background: #1e293b;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .search-mobile {
+    background: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* iOS Safari 底部安全区域 */
+@supports (padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .nav-mobile {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+/* 横屏模式优化 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .modal-mobile {
+    max-height: 90vh;
+  }
+
+  .nav-mobile {
+    padding: 4px 0;
+  }
+
+  .btn-mobile {
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+/* 打印样式移动端兼容 */
+@media print and (max-width: 768px) {
+  .nav-mobile,
+  .sidebar-mobile,
+  .search-mobile {
+    display: none !important;
+  }
+
+  .modal-mobile {
+    break-inside: avoid;
   }
 }
 
@@ -729,6 +1197,293 @@ html {
 }
 
 /* ========================================
+   本体感设计系统增强
+   ======================================== */
+
+/* 悬停时的本体感反馈 */
+.interactive-surface {
+  @apply relative overflow-hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-surface::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent;
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.interactive-surface:hover::before {
+  transform: translateX(100%);
+}
+
+.interactive-surface:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 按钮的本体感交互 */
+.btn-ontological {
+  @apply relative overflow-hidden font-medium transition-all duration-300;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  box-shadow:
+    0 4px 15px rgba(245, 158, 11, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-ontological::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/20;
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.btn-ontological:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-ontological:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 25px rgba(245, 158, 11, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-ontological:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 8px rgba(245, 158, 11, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 输入框的本体感设计 */
+.input-ontological {
+  @apply relative bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-lg transition-all duration-300;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.input-ontological:focus {
+  @apply border-amber-500;
+  box-shadow:
+    0 0 0 3px rgba(245, 158, 11, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  transform: scale(1.01);
+}
+
+/* 卡片的本体感设计 */
+.card-ontological {
+  @apply relative bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-300;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.card-ontological:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 导航项的本体感交互 */
+.nav-item-ontological {
+  @apply relative overflow-hidden rounded-lg transition-all duration-300;
+}
+
+.nav-item-ontological::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10 opacity-0 transition-opacity duration-300;
+}
+
+.nav-item-ontological:hover::before {
+  @apply opacity-100;
+}
+
+.nav-item-ontological:hover {
+  transform: translateX(4px);
+}
+
+/* 标签的本体感设计 */
+.badge-ontological {
+  @apply relative overflow-hidden px-3 py-1 rounded-full text-sm font-medium transition-all duration-300;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.badge-ontological:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ========================================
+   微交互增强
+   ======================================== */
+
+/* 点击涟漪效果 */
+.ripple {
+  @apply relative overflow-hidden;
+}
+
+.ripple::after {
+  content: '';
+  @apply absolute inset-0 bg-white/30 rounded-full scale-0 opacity-70;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.ripple:active::after {
+  transform: scale(2);
+  opacity: 0;
+}
+
+/* 加载状态的本体感 */
+.loading-ontological {
+  @apply relative;
+}
+
+.loading-ontological::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent;
+  animation: loading-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 成功状态的本体感反馈 */
+.success-feedback {
+  animation: success-pulse 0.6s ease-out;
+}
+
+@keyframes success-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* 错误状态的本体感反馈 */
+.error-feedback {
+  animation: error-shake 0.5s ease-out;
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* 工具提示的本体感设计 */
+.tooltip-ontological {
+  @apply relative bg-slate-900 dark:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-lg border border-slate-700 dark:border-slate-600;
+  animation: tooltip-appear 0.2s ease-out;
+}
+
+.tooltip-ontological::before {
+  content: '';
+  @apply absolute w-2 h-2 bg-slate-900 dark:bg-slate-700 border-l border-b border-slate-700 dark:border-slate-600;
+  transform: rotate(45deg);
+}
+
+@keyframes tooltip-appear {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========================================
+   增强的动画序列
+   ======================================== */
+
+/* 列表项的交错进入动画 */
+.stagger-item {
+  animation: stagger-fade-in 0.6s ease-out both;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 页面内容的渐进加载 */
+.content-reveal {
+  animation: content-reveal 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ========================================
+   响应式本体感设计
+   ======================================== */
+
+@media (max-width: 768px) {
+  .interactive-surface:hover {
+    transform: none;
+  }
+
+  .btn-ontological:hover {
+    transform: none;
+  }
+
+  .card-ontological:hover {
+    transform: none;
+  }
+
+  .nav-item-ontological:hover {
+    transform: none;
+  }
+
+  .badge-ontological:hover {
+    transform: none;
+  }
+
+  .input-ontological:focus {
+    transform: none;
+  }
+}
+
+/* ========================================
    禁用动画（可访问性）
    ======================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -738,5 +1493,14 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .interactive-surface,
+  .btn-ontological,
+  .card-ontological,
+  .nav-item-ontological,
+  .badge-ontological,
+  .input-ontological {
+    transform: none !important;
   }
 }

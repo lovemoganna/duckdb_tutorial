@@ -2,6 +2,7 @@ import { CodeBlock } from './CodeBlock';
 import { InfoBox } from './InfoBox';
 import { Paragraph } from './Paragraph';
 import { SQLExplainer } from './SQLExplainer';
+import { DataFlowAnimation } from './DataFlowAnimation';
 import type { Note } from '../types';
 
 interface SectionProps {
@@ -34,6 +35,8 @@ export function MathStatsFunctionsSection({ sectionId, addNote, updateNote, dele
       <Paragraph {...noteProps('p1')}>
         数学和统计函数是数据分析的核心。DuckDB 提供了丰富的数值计算、统计分析函数，帮助我们从原始数据中提取有价值的洞察。
       </Paragraph>
+
+      <DataFlowAnimation type="group" />
 
       <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">基本数学函数</h3>
 
@@ -240,6 +243,8 @@ export function TypeConversionSection({ sectionId, addNote, updateNote, deleteNo
       <Paragraph {...noteProps('p1')}>
         类型转换是数据处理的基础。不同数据源、不同格式的数据需要统一处理，DuckDB 提供了丰富的类型转换函数，确保数据在不同操作间正确流动。
       </Paragraph>
+
+      <DataFlowAnimation type="transform" />
 
       <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-4">CAST 与 CONVERT</h3>
 

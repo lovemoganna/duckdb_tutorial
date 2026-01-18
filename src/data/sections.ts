@@ -30,7 +30,21 @@ export const modules: Module[] = [
       { id: 'select', title: 'SELECT - 查询', icon: '🔍' },
       { id: 'update', title: 'UPDATE - 更新', icon: '📝' },
       { id: 'delete', title: 'DELETE - 删除', icon: '🗑️' },
-      { id: 'transactions', title: '事务处理', icon: '🔄' },
+    ],
+  },
+  {
+    id: 'transactions',
+    title: '🔄 事务处理',
+    icon: '🔄',
+    sections: [
+      { id: 'transaction-basics', title: '事务基础概念', icon: '📚' },
+      { id: 'acid-properties', title: 'ACID 属性详解', icon: '🔍' },
+      { id: 'isolation-levels', title: '隔离级别与并发控制', icon: '🎛️' },
+      { id: 'concurrency-problems', title: '并发问题分析', icon: '⚠️' },
+      { id: 'savepoints-nested', title: '保存点与嵌套事务', icon: '🔖' },
+      { id: 'transaction-patterns', title: '事务设计模式', icon: '🎯' },
+      { id: 'real-world-examples', title: '实际应用案例', icon: '💼' },
+      { id: 'performance-tuning', title: '性能优化与监控', icon: '🚀' },
     ],
   },
   {
@@ -199,6 +213,14 @@ export const modules: Module[] = [
       { id: 'model-evaluation', title: '模型评估', icon: '📊' },
       { id: 'online-learning', title: '在线学习', icon: '📈' },
       { id: 'ml-optimization', title: 'ML 查询优化', icon: '🚀' },
+    ],
+  },
+  {
+    id: 'faq',
+    title: '❓ 常见问题',
+    icon: '❓',
+    sections: [
+      { id: 'faq-main', title: 'FAQ - 常见问题解答', icon: '💡' },
     ],
   },
 ];

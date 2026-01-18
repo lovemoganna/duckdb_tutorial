@@ -54,7 +54,7 @@ export function InfoBox({
   return (
     <div className={cn(
       'p-5 rounded-xl border my-6 relative transition-all duration-300',
-      'hover:shadow-md',
+      'hover:shadow-md card-hover animate-fade-in',
       styles[type]
     )}>
       <div className="flex items-start gap-3">

@@ -11,7 +11,7 @@ interface NoteButtonProps {
   onDelete: (id: string) => void;
 }
 
-export function NoteButton({ sectionId: _sectionId, blockId: _blockId, notes, onAdd, onUpdate, onDelete }: NoteButtonProps) {
+export function NoteButton({ sectionId: _sectionId, blockId: _blockId, notes = [], onAdd, onUpdate, onDelete }: NoteButtonProps) {
   // sectionId and blockId are used by parent components for note management
   void _sectionId;
   void _blockId;
@@ -19,7 +19,7 @@ export function NoteButton({ sectionId: _sectionId, blockId: _blockId, notes, on
   const [editingId, setEditingId] = useState<string | null>(null);
   const [content, setContent] = useState('');
 
-  const hasNotes = notes.length > 0;
+  const hasNotes = notes && notes.length > 0;
 
   const handleSave = () => {
     if (!content.trim()) return;
@@ -62,14 +62,14 @@ export function NoteButton({ sectionId: _sectionId, blockId: _blockId, notes, on
             ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
             : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600'
         )}
-        title={hasNotes ? `${notes.length} 条笔记` : '添加笔记'}
+        title={hasNotes ? `${notes?.length || 0} 条笔记` : '添加笔记'}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
         {hasNotes && (
           <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-            {notes.length}
+            {notes?.length || 0}
           </span>
         )}
       </button>
@@ -93,7 +93,7 @@ export function NoteButton({ sectionId: _sectionId, blockId: _blockId, notes, on
             </div>
 
             <div className="max-h-64 overflow-y-auto">
-              {notes.map(note => (
+              {(notes || []).map(note => (
                 <div key={note.id} className="p-3 border-b border-slate-100 last:border-0">
                   {editingId === note.id ? (
                     <textarea
